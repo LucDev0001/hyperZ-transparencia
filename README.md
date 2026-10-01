@@ -60,7 +60,7 @@ Por padrão, ele busca um arquivo `api/api.php` para encaminhar as requisições
 3. Publique apenas um arquivo chamado `.env.example` (ou `.env.example.txt`) com dados falsos para servir de modelo, por exemplo:
    ```env
    API_KEY_TRANSPARENCIA=sua_chave_aqui
-   API_KEY_OPENAI=sua_chave_aqui
+   
    ```
    Assim, quem baixar o projeto renomeará esse arquivo para `.env` e colocará suas próprias chaves.
 
