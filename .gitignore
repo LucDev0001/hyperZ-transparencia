@@ -1,0 +1,15 @@
+# Ignorar variáveis de ambiente (Chaves secretas, senhas, etc)
+.env
+
+# Ignorar pastas de ambiente virtual Python (se houver scripts)
+.venv/
+venv/
+__pycache__/
+
+# Logs
+error_log
+*.log
+
+# Dependências comuns (se vier a usar composer ou npm futuramente)
+vendor/
+node_modules/

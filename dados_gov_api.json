@@ -1,0 +1,72 @@
+[
+  {
+    "endpoint": "package_list",
+    "url": "https://dados.gov.br/api/3/action/package_list",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "package_show",
+    "url": "https://dados.gov.br/api/3/action/package_show",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "package_search",
+    "url": "https://dados.gov.br/api/3/action/package_search",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "resource_show",
+    "url": "https://dados.gov.br/api/3/action/resource_show",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "organization_list",
+    "url": "https://dados.gov.br/api/3/action/organization_list",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "organization_show",
+    "url": "https://dados.gov.br/api/3/action/organization_show",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "group_list",
+    "url": "https://dados.gov.br/api/3/action/group_list",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "group_show",
+    "url": "https://dados.gov.br/api/3/action/group_show",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "tag_list",
+    "url": "https://dados.gov.br/api/3/action/tag_list",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "endpoint": "tag_show",
+    "url": "https://dados.gov.br/api/3/action/tag_show",
+    "metodo": "GET",
+    "descricao": "CKAN API endpoint",
+    "erro": "Expecting value: line 1 column 1 (char 0)"
+  }
+]
