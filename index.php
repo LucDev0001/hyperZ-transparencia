@@ -15,6 +15,7 @@ $nav = [
   ['partidos',      '🚩', 'Partidos',            'normal', ''],
   ['servidores',    '👥', 'Servidores',          'normal', ''],
   ['eleicoes',      '🗳️', 'Eleições (TSE)',      'normal', ''],
+  ['apuracao',      '📊', 'Eleições 2026',       'red',    ''],
   ['presidentes',   '🇧🇷', 'Presidentes',        'normal', ''],
   ['orcamento',     '💰', 'Orçamento',           'normal', ''],
   ['gestao',        '📊', 'Gestão & Finanças',   'normal', ''],

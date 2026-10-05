@@ -11,9 +11,14 @@
                 </div>
                 
                 <!-- Seletor de Ano -->
-                <div class="bg-zinc-900/80 p-1.5 rounded-2xl border border-white/10 flex w-full md:w-auto shadow-2xl">
-                    <button onclick="setElectionYear(2022)" id="tseYearBtn2022" class="flex-1 md:flex-none px-10 py-3 rounded-xl text-xs font-black transition-all bg-violet-600 text-white">2022 GERAL</button>
-                    <button onclick="setElectionYear(2024)" id="tseYearBtn2024" class="flex-1 md:flex-none px-10 py-3 rounded-xl text-xs font-black transition-all text-zinc-500 hover:text-white">2024 MUNICIPAL</button>
+                <div class="bg-zinc-900/80 p-1.5 rounded-2xl border border-white/10 flex w-full shadow-2xl overflow-x-auto scrollbar-hide snap-x" style="scrollbar-width: none;">
+                    <button onclick="setElectionYear(2024)" id="tseYearBtn2024" class="flex-none px-6 py-3 rounded-xl text-[10px] md:text-xs font-black transition-all bg-violet-600 text-white snap-start">2024 MUN</button>
+                    <button onclick="setElectionYear(2022)" id="tseYearBtn2022" class="flex-none px-6 py-3 rounded-xl text-[10px] md:text-xs font-black transition-all text-zinc-500 hover:text-white snap-start">2022 GERAL</button>
+                    <button onclick="setElectionYear(2020)" id="tseYearBtn2020" class="flex-none px-6 py-3 rounded-xl text-[10px] md:text-xs font-black transition-all text-zinc-500 hover:text-white snap-start">2020 MUN</button>
+                    <button onclick="setElectionYear(2018)" id="tseYearBtn2018" class="flex-none px-6 py-3 rounded-xl text-[10px] md:text-xs font-black transition-all text-zinc-500 hover:text-white snap-start">2018 GERAL</button>
+                    <button onclick="setElectionYear(2016)" id="tseYearBtn2016" class="flex-none px-6 py-3 rounded-xl text-[10px] md:text-xs font-black transition-all text-zinc-500 hover:text-white snap-start">2016 MUN</button>
+                    <button onclick="setElectionYear(2014)" id="tseYearBtn2014" class="flex-none px-6 py-3 rounded-xl text-[10px] md:text-xs font-black transition-all text-zinc-500 hover:text-white snap-start">2014 GERAL</button>
+                    <button onclick="setElectionYear(2012)" id="tseYearBtn2012" class="flex-none px-6 py-3 rounded-xl text-[10px] md:text-xs font-black transition-all text-zinc-500 hover:text-white snap-start">2012 MUN</button>
                 </div>
             </div>
 
@@ -73,9 +78,9 @@
                                 <option value="7">Deputado Estadual</option>
                             </optgroup>
                             <optgroup label="ELEIÇÃO MUNICIPAL 2024" id="tseRoleMun" class="hidden">
-                                <option value="1">Prefeito</option>
-                                <option value="11">Vereador</option>
-                                <option value="13">Vice-Prefeito</option>
+                                <option value="11">Prefeito</option>
+                                <option value="13">Vereador</option>
+                                <option value="12">Vice-Prefeito</option>
                             </optgroup>
                         </select>
                     </div>

@@ -1,4 +1,4 @@
-let currentElectionYear = 2022;
+let currentElectionYear = 2024;
 let selectedUF = "";
 let selectedCityCode = "";
 let map = null;
@@ -7,8 +7,13 @@ let currentCandidateData = null;
 let candidatePatrimonioChart = null;
 
 const TSE_CONFIG = {
+    2024: { id: '2045202024', type: 'municipal' },
     2022: { id: '2040602022', type: 'geral' },
-    2024: { id: '2045202024', type: 'municipal' }
+    2020: { id: '2030402020', type: 'municipal' },
+    2018: { id: '2022802018', type: 'geral' },
+    2016: { id: '2', type: 'municipal' },
+    2014: { id: '680', type: 'geral' },
+    2012: { id: '1699', type: 'municipal' }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,6 +34,12 @@ async function initLeafletMap() {
         tap: false, // Desativa tap handler interno do Leaflet que causa problemas em PWAs/Mobile
         dragging: !L.Browser.mobile || L.Browser.pointer // Otimiza arraste
     });
+
+    // Fix Leaflet map size when container becomes visible
+    new ResizeObserver(() => {
+        if (map) map.invalidateSize();
+    }).observe(mapDiv);
+
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
     try {
         const response = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson');
@@ -73,27 +84,29 @@ window.selectStateFromMap = function(uf, nome) {
         info.classList.remove('hidden');
         document.getElementById('active-uf-display').textContent = `${uf} - ${nome.toUpperCase()}`;
     }
-    if (currentElectionYear === 2024) loadTseCitiesAndSearch(uf);
+    const config = TSE_CONFIG[currentElectionYear];
+    if (config.type === 'municipal') loadTseCitiesAndSearch(uf);
     else searchCandidates();
 };
 
 window.setElectionYear = function(year) {
     currentElectionYear = year;
+    const config = TSE_CONFIG[year];
     document.querySelectorAll('[id^="tseYearBtn"]').forEach(btn => {
         const active = btn.id.includes(year);
-        btn.className = active ? "flex-1 md:flex-none px-10 py-3 rounded-xl text-xs font-black transition-all bg-violet-600 text-white shadow-xl" : "flex-1 md:flex-none px-10 py-3 rounded-xl text-xs font-black transition-all text-zinc-500 hover:text-white";
+        btn.className = active ? "flex-1 md:flex-none px-6 py-3 rounded-xl text-xs font-black transition-all bg-violet-600 text-white shadow-xl" : "flex-1 md:flex-none px-6 py-3 rounded-xl text-xs font-black transition-all text-zinc-500 hover:text-white";
     });
     selectedUF = "";
     const cityContainer = document.getElementById('tseCityContainer');
     if (cityContainer) cityContainer.classList.add('hidden');
     
-    document.getElementById('tseRoleGeral').classList.toggle('hidden', year === 2024);
-    document.getElementById('tseRoleMun').classList.toggle('hidden', year !== 2024);
+    document.getElementById('tseRoleGeral').classList.toggle('hidden', config.type === 'municipal');
+    document.getElementById('tseRoleMun').classList.toggle('hidden', config.type !== 'municipal');
     document.getElementById('selected-state-info')?.classList.add('hidden');
     if (geoJsonLayer) geoJsonLayer.setStyle({ fillColor: '#18181b', fillOpacity: 0.8, weight: 1, color: '#3f3f46' });
     
     document.getElementById('tseResults').innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-40 bg-zinc-900/10 rounded-[3rem] border-2 border-dashed border-white/5"><div class="text-6xl mb-6 opacity-20 animate-pulse">🗺️</div><h3 class="text-zinc-600 font-black text-sm uppercase tracking-[0.4em]">Base ${year} Ativada</h3><p class="text-zinc-700 text-[10px] mt-3 font-bold uppercase">Toque em qualquer estado no mapa para investigar</p></div>`;
-    document.getElementById('tseRole').value = (year === 2024) ? "1" : "6";
+    document.getElementById('tseRole').value = (config.type === 'municipal') ? "11" : "6";
 };
 
 async function loadTseCitiesAndSearch(uf) {
@@ -116,8 +129,11 @@ window.searchCandidates = async function() {
     const role = document.getElementById('tseRole').value;
     const query = document.getElementById('tseSearch').value.trim().toLowerCase();
     const resultsDiv = document.getElementById('tseResults');
-    let ue = (currentElectionYear === 2022 && role === "1") ? "BR" : selectedUF;
-    if (currentElectionYear === 2024) ue = document.getElementById('tseCityCode')?.value;
+    const config = TSE_CONFIG[currentElectionYear];
+    
+    let ue = (config.type === 'geral' && role === "1") ? "BR" : selectedUF;
+    if (config.type === 'municipal') ue = document.getElementById('tseCityCode')?.value;
+    
     if (!ue && role !== "1") return;
     resultsDiv.innerHTML = `<div class="col-span-full text-center py-40"><div class="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-8 shadow-[0_0_20px_#7c3aed]"></div><p class="text-white font-black uppercase text-[10px] tracking-[0.8em]">Extraindo Dossiês Oficiais...</p></div>`;
     try {

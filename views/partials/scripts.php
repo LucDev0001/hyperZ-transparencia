@@ -7,6 +7,7 @@
 <script src="<?php echo BASE_PATH; ?>/transparency/js/parties.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/risk.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/elections.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo BASE_PATH; ?>/transparency/js/apuracao.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/presidents.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/tabs.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/map.js?v=<?php echo time(); ?>"></script>

@@ -1,6 +1,85 @@
 <!-- Tela Inicial (Dashboard) -->
 <div id="content-home" class="hidden animate-fade-in">
     
+    <!-- Widget Eleições 2026 -->
+    <div onclick="window.customSwitchTab('apuracao')" class="cursor-pointer group relative mb-6 rounded-3xl border border-red-500/30 bg-gradient-to-r from-red-950/40 to-zinc-900/40 overflow-hidden shadow-[0_0_40px_rgba(220,38,38,0.15)] hover:shadow-[0_0_60px_rgba(220,38,38,0.3)] hover:border-red-500/60 transition-all duration-500 flex flex-col md:flex-row items-center justify-between p-6 md:p-8">
+        <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors pointer-events-none"></div>
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-red-600/20 blur-[100px] rounded-full pointer-events-none"></div>
+        
+        <div class="relative z-10 flex items-center gap-5 mb-6 md:mb-0 w-full md:w-auto justify-center md:justify-start">
+            <div class="relative flex h-14 w-14 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
+                <div class="relative inline-flex rounded-full h-14 w-14 bg-red-950 border border-red-500/50 items-center justify-center text-red-500 text-2xl shadow-inner">
+                    🗳️
+                </div>
+            </div>
+            <div class="text-center md:text-left">
+                <h3 class="text-white font-black text-xl lg:text-2xl uppercase tracking-tighter flex items-center justify-center md:justify-start gap-2 italic">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    Eleições 2026
+                </h3>
+                <p class="text-red-400/80 text-xs font-bold uppercase tracking-[0.2em] mt-1 group-hover:text-red-400 transition-colors">Acompanhe a apuração oficial →</p>
+            </div>
+        </div>
+
+        <div class="relative z-10 flex gap-2 sm:gap-3 text-center shrink-0">
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-xl">
+                <div id="eleicoes-cd-d" class="text-2xl sm:text-3xl font-black text-white tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Dias</div>
+            </div>
+            <div class="flex items-center text-white/20 font-black text-2xl mb-4">:</div>
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-xl">
+                <div id="eleicoes-cd-h" class="text-2xl sm:text-3xl font-black text-white tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Hrs</div>
+            </div>
+            <div class="flex items-center text-white/20 font-black text-2xl mb-4">:</div>
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-xl">
+                <div id="eleicoes-cd-m" class="text-2xl sm:text-3xl font-black text-white tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Min</div>
+            </div>
+            <div class="flex items-center text-white/20 font-black text-2xl mb-4">:</div>
+            <div class="bg-red-950/40 backdrop-blur-md border border-red-500/30 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
+                <div id="eleicoes-cd-s" class="text-2xl sm:text-3xl font-black text-red-400 tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-red-500/70 font-bold uppercase tracking-widest mt-1">Seg</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function updateElectionCountdown() {
+            // Eleições Gerais: 04/10/2026 08:00
+            const electionDate = new Date("2026-10-04T08:00:00-03:00").getTime();
+            const now = new Date().getTime();
+            const distance = electionDate - now;
+
+            const elD = document.getElementById("eleicoes-cd-d");
+            const elH = document.getElementById("eleicoes-cd-h");
+            const elM = document.getElementById("eleicoes-cd-m");
+            const elS = document.getElementById("eleicoes-cd-s");
+
+            if (!elD) return;
+
+            if (distance < 0) {
+                elD.innerHTML = "00";
+                elH.innerHTML = "00";
+                elM.innerHTML = "00";
+                elS.innerHTML = "00";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            elD.innerHTML = days.toString().padStart(2, '0');
+            elH.innerHTML = hours.toString().padStart(2, '0');
+            elM.innerHTML = minutes.toString().padStart(2, '0');
+            elS.innerHTML = seconds.toString().padStart(2, '0');
+        }
+        setInterval(updateElectionCountdown, 1000);
+        setTimeout(updateElectionCountdown, 100);
+    </script>
+
     <!-- Hero Section -->
     <div class="relative mb-10 rounded-3xl border border-white/10 bg-zinc-900/50 p-6 sm:p-10 lg:p-12 text-center lg:text-left flex flex-col lg:flex-row items-center gap-8 shadow-2xl">
         <div class="absolute inset-0 bg-gradient-to-br from-violet-600/20 to-indigo-600/10 pointer-events-none rounded-3xl overflow-hidden"></div>

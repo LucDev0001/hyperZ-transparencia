@@ -347,13 +347,19 @@ async function loadDeputies() {
     '<div class="col-span-full text-center py-10 text-zinc-500"><span class="animate-pulse">Carregando dados de Brasília...</span></div>';
 
   try {
-    let query = `deputados?ordem=ASC&ordenarPor=nome&itens=100`;
-    if (uf) query += `&siglaUf=${uf}`;
-    if (party) query += `&siglaPartido=${party}`;
-    if (name) query += `&nome=${name}`;
+    let query = `deputados?ordem=ASC&ordenarPor=nome&itens=1000`;
 
     const json = await api.camara(query);
-    const deputies = json.dados || [];
+    let deputies = json.dados || [];
+
+    if (uf) deputies = deputies.filter(d => d.siglaUf === uf);
+    if (party) deputies = deputies.filter(d => d.siglaPartido === party);
+    if (name) {
+      const searchTerm = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      deputies = deputies.filter(d => 
+        d.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes(searchTerm)
+      );
+    }
 
     if (deputies.length === 0) {
       grid.innerHTML =

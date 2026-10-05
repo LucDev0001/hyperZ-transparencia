@@ -9,6 +9,13 @@ let mapMarkers = [];
 let mapLastDeputyId = null;
 let analysisChartInstance = null;
 let currentDeputy = null;
+let expensesLoadCounter = 0;
+let billsLoadCounter = 0;
+
+function getLegislatureId(year) {
+    return Math.floor((parseInt(year) - 1999) / 4) + 51;
+}
+
 
 async function openDeputyDetails(id) {
   if (typeof toggleSpinner === "function") toggleSpinner(true);
@@ -479,6 +486,7 @@ async function loadDeputyExpenses(id, force = false) {
   const selectedMonth = monthSelect ? monthSelect.value : "";
   const selectedDay = daySelect ? daySelect.value : "";
   const cacheKey = `${selectedYear}-${selectedMonth}-${selectedDay}`;
+  const currentLoad = ++expensesLoadCounter;
 
   if (!force && list.getAttribute("data-loaded") === cacheKey) return;
 
@@ -487,27 +495,68 @@ async function loadDeputyExpenses(id, force = false) {
   document.getElementById("totalExpenses").textContent = "R$ ...";
 
   try {
-    let query = `deputados/${id}/despesas?ano=${selectedYear}&ordem=DESC&ordenarPor=dataDocumento&itens=100`;
+    const legId = getLegislatureId(selectedYear);
+    let query = `deputados/${id}/despesas?ano=${selectedYear}&idLegislatura=${legId}&ordem=DESC&ordenarPor=dataDocumento&itens=100&pagina=1`;
     if (selectedMonth) query += `&mes=${selectedMonth}`;
 
     let json = await api.camara(query);
+    let actualYear = selectedYear;
     
     // Auto-fallback: Se não houver dados no ano atual (ex: início de ano, ou lag da API), tenta os 2 anos anteriores
     if ((!json.dados || json.dados.length === 0) && selectedYear == new Date().getFullYear() && !selectedMonth && !selectedDay) {
         for (let i = 1; i <= 3; i++) {
-            const fallbackYear = selectedYear - i;
-            if (yearSelect) yearSelect.value = fallbackYear;
-            query = `deputados/${id}/despesas?ano=${fallbackYear}&ordem=DESC&ordenarPor=dataDocumento&itens=100`;
+            actualYear = selectedYear - i;
+            if (yearSelect) yearSelect.value = actualYear;
+            const fallbackLegId = getLegislatureId(actualYear);
+            query = `deputados/${id}/despesas?ano=${actualYear}&idLegislatura=${fallbackLegId}&ordem=DESC&ordenarPor=dataDocumento&itens=100&pagina=1`;
             json = await api.camara(query);
             if (json.dados && json.dados.length > 0) break;
         }
     }
     
-    currentExpensesData = json.dados || [];
+    let allData = [];
+    if (json.dados && json.dados.length > 0) {
+        allData = allData.concat(json.dados);
+        
+        if (json.dados.length === 100) {
+            let page = 2;
+            let keepFetching = true;
+            while (keepFetching) {
+                const batchSize = 4;
+                const promises = [];
+                const batchLegId = getLegislatureId(actualYear);
+                for (let i = 0; i < batchSize; i++) {
+                    let bQuery = `deputados/${id}/despesas?ano=${actualYear}&idLegislatura=${batchLegId}&ordem=DESC&ordenarPor=dataDocumento&itens=100&pagina=${page + i}`;
+                    if (selectedMonth) bQuery += `&mes=${selectedMonth}`;
+                    promises.push(api.camara(bQuery));
+                }
+                const results = await Promise.all(promises);
+                for (let res of results) {
+                    if (res.dados && res.dados.length > 0) {
+                        allData = allData.concat(res.dados);
+                        if (res.dados.length < 100) {
+                            keepFetching = false;
+                            break;
+                        }
+                    } else {
+                        keepFetching = false;
+                        break;
+                    }
+                }
+                page += batchSize;
+                if (page > 30) keepFetching = false; // limite de segurança
+            }
+        }
+    }
+    
+    if (currentLoad !== expensesLoadCounter) return;
+    
+    currentExpensesData = allData || [];
 
     // Filtragem por dia no cliente (API retorna o mês todo)
     if (selectedDay) {
       currentExpensesData = currentExpensesData.filter((d) => {
+        if (!d.dataDocumento) return false;
         const dayFromDoc = parseInt(d.dataDocumento.split("-")[2]); // YYYY-MM-DD
         return dayFromDoc === parseInt(selectedDay);
       });
@@ -1108,6 +1157,7 @@ async function loadDeputyBills(id, force = false) {
   const container = document.getElementById("billsList");
   const yearSelect = document.getElementById("sel-year-projetos");
   const selectedYear = yearSelect ? yearSelect.value : new Date().getFullYear();
+  const currentLoad = ++billsLoadCounter;
 
   if (!force && container.getAttribute("data-loaded") === selectedYear) return;
 
@@ -1117,13 +1167,38 @@ async function loadDeputyBills(id, force = false) {
     "...</span></div>";
 
   try {
-    const json = await api.camara(`proposicoes?idDeputadoAutor=${id}&ano=${selectedYear}&ordem=DESC&ordenarPor=id&itens=50`);
-    if (json.dados.length === 0) {
+    let allData = [];
+    let page = 1;
+    let keepFetching = true;
+    while(keepFetching) {
+        const batchSize = 3;
+        const promises = [];
+        for (let i = 0; i < batchSize; i++) {
+            promises.push(api.camara(`proposicoes?idDeputadoAutor=${id}&ano=${selectedYear}&ordem=DESC&ordenarPor=id&itens=100&pagina=${page + i}`));
+        }
+        const results = await Promise.all(promises);
+        for(let json of results) {
+            if (json.dados && json.dados.length > 0) {
+                allData = allData.concat(json.dados);
+                if (json.dados.length < 100) {
+                    keepFetching = false;
+                    break;
+                }
+            } else {
+                keepFetching = false;
+                break;
+            }
+        }
+        page += batchSize;
+        if(page > 15) keepFetching = false; // Max 1500 proposicoes per year
+    }
+
+    if (allData.length === 0) {
       container.innerHTML = `<div class="text-center text-zinc-500 py-4">Nenhum projeto encontrado em ${selectedYear}.</div>`;
       container.setAttribute("data-loaded", selectedYear);
       return;
     }
-    container.innerHTML = json.dados
+    container.innerHTML = allData
       .map(
         (p) => `
             <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-700 hover:border-violet-500 transition">
@@ -1893,16 +1968,45 @@ async function openShareDeputyModal(id) {
   if (currentExpensesData.length === 0 && d.id) {
     try {
       let year = new Date().getFullYear();
-      let json = await api.camara(`deputados/${d.id}/despesas?ano=${year}&ordem=DESC&ordenarPor=dataDocumento&itens=100`);
+      let legId = getLegislatureId(year);
+      let query = `deputados/${d.id}/despesas?ano=${year}&idLegislatura=${legId}&ordem=DESC&ordenarPor=dataDocumento&itens=100&pagina=1`;
+      let json = await api.camara(query);
       
       if (!json?.dados || json.dados.length === 0) {
         for (let i = 1; i <= 3; i++) {
-            json = await api.camara(`deputados/${d.id}/despesas?ano=${year - i}&ordem=DESC&ordenarPor=dataDocumento&itens=100`);
+            year = year - 1;
+            let fbLegId = getLegislatureId(year);
+            json = await api.camara(`deputados/${d.id}/despesas?ano=${year}&idLegislatura=${fbLegId}&ordem=DESC&ordenarPor=dataDocumento&itens=100&pagina=1`);
             if (json?.dados?.length > 0) break;
         }
       }
       
-      if (json?.dados?.length > 0) currentExpensesData = json.dados;
+      if (json?.dados?.length > 0) {
+        let allData = [].concat(json.dados);
+        if (json.dados.length === 100) {
+            let page = 2;
+            let keepFetching = true;
+            let bLegId = getLegislatureId(year);
+            while(keepFetching) {
+                const batch = [];
+                for(let i=0; i<4; i++) {
+                    batch.push(api.camara(`deputados/${d.id}/despesas?ano=${year}&idLegislatura=${bLegId}&ordem=DESC&ordenarPor=dataDocumento&itens=100&pagina=${page+i}`));
+                }
+                const results = await Promise.all(batch);
+                for(let r of results) {
+                    if(r.dados && r.dados.length > 0) {
+                        allData = allData.concat(r.dados);
+                        if(r.dados.length < 100) { keepFetching = false; break; }
+                    } else {
+                        keepFetching = false; break;
+                    }
+                }
+                page += 4;
+                if(page > 30) keepFetching = false;
+            }
+        }
+        currentExpensesData = allData;
+      }
     } catch(e) {}
   }
 
