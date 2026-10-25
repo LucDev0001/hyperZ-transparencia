@@ -38,8 +38,12 @@ const Apuracao = {
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png').addTo(this.map);
 
         // Fetch GeoJSON for Brazil States locally
+<<<<<<< HEAD
         const geoUrl = (window.BASE_PATH || '') + '/transparency/js/brazil-states.geojson';
         fetch(geoUrl)
+=======
+        fetch('js/brazil-states.geojson')
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
             .then(res => res.json())
             .then(data => {
                 this.geoLayer = L.geoJson(data, {
@@ -158,9 +162,14 @@ const Apuracao = {
 
         // Construção da URL Oficial
         // Formato: https://resultados.tse.jus.br/oficial/ele2026/[codigo_eleicao]/dados/[uf]/[uf]-c[codigo_cargo]-e0[codigo_eleicao]-u.json
+<<<<<<< HEAD
         const basePath = window.BASE_PATH || '';
         const officialUrl = `https://resultados.tse.jus.br/oficial/ele2026/${eleicao}/dados/${uf}/${uf}-c${cargo}-e00${eleicao}-u.json`;
         const proxyUrl = `${basePath}/transparency/api/proxy_tse.php?url=${encodeURIComponent(officialUrl)}`;
+=======
+        const officialUrl = `https://resultados.tse.jus.br/oficial/ele2026/${eleicao}/dados/${uf}/${uf}-c${cargo}-e00${eleicao}-u.json`;
+        const proxyUrl = `api/proxy_tse.php?url=${encodeURIComponent(officialUrl)}`;
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
 
         try {
             const response = await fetch(proxyUrl, {
@@ -191,6 +200,7 @@ const Apuracao = {
             timeEl.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
 
         } catch (error) {
+<<<<<<< HEAD
             // Se os servidores do TSE ainda não geraram os arquivos 2026 em tempo real, exibe a projeção eleitoral oficial
             const fallbackData = this.getFallbackData(cargo, uf);
             this.renderData(fallbackData);
@@ -203,6 +213,23 @@ const Apuracao = {
         } finally {
             this.isFetching = false;
             btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Sincronizar Agora`;
+=======
+            // Oculta log sujo se for apenas eleição não iniciada (erro esperado)
+            if (error.message.includes('não iniciada') || error.message.includes('HTTP 404')) {
+                console.log("Aguardando dados oficiais do TSE... (Eleição não iniciada)");
+            } else {
+                console.error("Erro ao buscar dados do TSE:", error);
+            }
+
+            statusEl.className = 'text-xs font-black text-red-500';
+            statusEl.textContent = 'AGUARDANDO DADOS...';
+
+            this.renderError();
+            // Evitar spam de toast se for um erro de 404 rotineiro de polling
+        } finally {
+            this.isFetching = false;
+            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Atualizar Agora`;
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
         }
     },
 
@@ -450,10 +477,16 @@ const Apuracao = {
             const ufs = ['ac', 'al', 'ap', 'am', 'ba', 'ce', 'df', 'es', 'go', 'ma', 'mt', 'ms', 'mg', 'pa', 'pb', 'pr', 'pe', 'pi', 'rj', 'rn', 'rs', 'ro', 'rr', 'sc', 'sp', 'se', 'to'];
 
             // Vamos buscar todos em paralelo
+<<<<<<< HEAD
             const basePath = window.BASE_PATH || '';
             const fetchPromises = ufs.map(uf => {
                 const officialUrl = `https://resultados.tse.jus.br/oficial/ele2026/${eleicao}/dados/${uf}/${uf}-c0001-e00${eleicao}-u.json`;
                 const proxyUrl = `${basePath}/transparency/api/proxy_tse.php?url=${encodeURIComponent(officialUrl)}`;
+=======
+            const fetchPromises = ufs.map(uf => {
+                const officialUrl = `https://resultados.tse.jus.br/oficial/ele2026/${eleicao}/dados/${uf}/${uf}-c0001-e00${eleicao}-u.json`;
+                const proxyUrl = `api/proxy_tse.php?url=${encodeURIComponent(officialUrl)}`;
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
                 return fetch(proxyUrl, { method: 'GET', headers: { 'Accept': 'application/json' } })
                     .then(r => r.ok ? r.json() : null)
                     .then(data => {
@@ -481,6 +514,7 @@ const Apuracao = {
                 }
             });
 
+<<<<<<< HEAD
             if (Object.keys(ufWinners).length === 0) {
                 // Projeção eleitoral oficial para colorir o mapa dos estados
                 ufWinners = {
@@ -493,6 +527,8 @@ const Apuracao = {
                 };
             }
 
+=======
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
             // Pintar o mapa
             if (this.geoLayer) {
                 this.geoLayer.eachLayer(layer => {
@@ -543,6 +579,7 @@ const Apuracao = {
         `;
         },
 
+<<<<<<< HEAD
         getFallbackData(cargo, uf) {
             return {
                 pst: "100,00",
@@ -581,6 +618,8 @@ const Apuracao = {
             };
         },
 
+=======
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
         formatNumber(num) {
             return parseInt(num).toLocaleString('pt-BR');
         },
@@ -775,8 +814,12 @@ const style = document.createElement('style');
 
         async fetchMessages() {
             try {
+<<<<<<< HEAD
                 const chatUrl = `${window.BASE_PATH || ''}/transparency/api/chat.php`;
                 const response = await fetch(`${chatUrl}?action=read`);
+=======
+                const response = await fetch('api/chat.php?action=read');
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
                 if (!response.ok) return;
                 const data = await response.json();
                 this.renderMessages(data.messages || []);
@@ -829,8 +872,12 @@ const style = document.createElement('style');
             input.value = '';
 
             try {
+<<<<<<< HEAD
                 const chatUrl = `${window.BASE_PATH || ''}/transparency/api/chat.php`;
                 await fetch(`${chatUrl}?action=post`, {
+=======
+                await fetch('api/chat.php?action=post', {
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -849,6 +896,9 @@ const style = document.createElement('style');
             }
         }
     };
+<<<<<<< HEAD
 
     window.Apuracao = Apuracao;
     window.ApuracaoChat = ApuracaoChat;
+=======
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450

@@ -40,10 +40,14 @@ async function initLeafletMap() {
         if (map) map.invalidateSize();
     }).observe(mapDiv);
 
+<<<<<<< HEAD
     L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 16,
         subdomains: ['server', 'services']
     }).addTo(map);
+=======
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
     try {
         const response = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson');
         const data = await response.json();

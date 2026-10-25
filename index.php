@@ -3,6 +3,7 @@ require_once 'views/partials/icons.php';
 require_once 'views/partials/header.php'; 
 require_once 'views/partials/topbar.php'; 
 
+<<<<<<< HEAD
 // 4 Modular SaaS Navigation Groups
 $navGroups = [
   'parlamento' => [
@@ -51,6 +52,36 @@ $navGroups = [
       ['mapa',          'Mapa de Gastos',    'map',         'amber',  ''],
     ]
   ]
+=======
+<?php require_once 'views/partials/topbar.php'; ?>
+
+<?php
+// Navigation array — used by sidebar, bottom nav, home grid, and tabs.js
+$nav = [
+  ['politicos',     '👔', 'Deputados',          'normal', ''],
+  ['senadores',     '🏛️', 'Senadores',           'normal', ''],
+  ['radar',         '🔍', 'Radar A-C',           'red',    "if(typeof window.initRadarTab==='function')window.initRadarTab();"],
+  ['risco',         '🚨', 'Análise de Risco',    'red',    ''],
+  ['top_corrupcao', '🏆', 'Top Corrupção',       'red',    ''],
+  ['comparador',    '⚖️', 'Comparador',          'blue',   ''],
+  ['mapa',          '🗺️', 'Mapa de Gastos',      'amber',  ''],
+  ['partidos',      '🚩', 'Partidos',            'normal', ''],
+  ['servidores',    '👥', 'Servidores',          'normal', ''],
+  ['eleicoes',      '🗳️', 'Eleições (TSE)',      'normal', ''],
+  ['apuracao',      '📊', 'Eleições 2026',       'red',    ''],
+  ['presidentes',   '🇧🇷', 'Presidentes',        'normal', ''],
+  ['orcamento',     '💰', 'Orçamento',           'normal', ''],
+  ['gestao',        '📊', 'Gestão & Finanças',   'normal', ''],
+  ['outros',        '🏙️', 'Executivo & Mun.',    'normal', ''],
+  ['receitas',      '📊', 'Exec. Orçamentária',  'normal', ''],
+  ['viagens',       '✈️', 'Viagens a Serviço',   'normal', ''],
+  ['licitacoes',    '📝', 'Licitações',          'normal', ''],
+  ['imoveis',       '🏢', 'Imóveis Func.',       'normal', ''],
+  ['noticias',      '📰', 'Notícias',            'normal', ''],
+  ['rede',          '🕸️', 'Radar Conexões',      'violet', ''],
+  ['municipio',     '🏘️', 'Minha Cidade',        'normal', ''],
+  ['pautas_gz',     '🤝', 'Pautas GZ',           'green',  ''],
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
 ];
 
 // Flat array for tabs loading & backward compatibility

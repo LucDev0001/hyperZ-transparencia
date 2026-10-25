@@ -14,11 +14,19 @@
                 </div>
             </div>
             <div class="text-center md:text-left">
+<<<<<<< HEAD
                 <h3 id="eleicoes-widget-title" class="text-white font-black text-xl lg:text-2xl uppercase tracking-tighter flex items-center justify-center md:justify-start gap-2 italic">
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                     Eleições 2026
                 </h3>
                 <p id="eleicoes-widget-subtitle" class="text-red-400/80 text-xs font-bold uppercase tracking-[0.2em] mt-1 group-hover:text-red-400 transition-colors">Acompanhe a apuração oficial →</p>
+=======
+                <h3 class="text-white font-black text-xl lg:text-2xl uppercase tracking-tighter flex items-center justify-center md:justify-start gap-2 italic">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    Eleições 2026
+                </h3>
+                <p class="text-red-400/80 text-xs font-bold uppercase tracking-[0.2em] mt-1 group-hover:text-red-400 transition-colors">Acompanhe a apuração oficial →</p>
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
             </div>
         </div>
 
@@ -46,6 +54,7 @@
     </div>
     <script>
         function updateElectionCountdown() {
+<<<<<<< HEAD
             // Calendário Oficial TSE 2026:
             // 1º Turno: 04/10/2026 08:00 às 17:00
             // 2º Turno: 25/10/2026 08:00 às 17:00
@@ -57,6 +66,13 @@
 
             const titleEl = document.getElementById("eleicoes-widget-title");
             const subEl = document.getElementById("eleicoes-widget-subtitle");
+=======
+            // Eleições Gerais: 04/10/2026 08:00
+            const electionDate = new Date("2026-10-04T08:00:00-03:00").getTime();
+            const now = new Date().getTime();
+            const distance = electionDate - now;
+
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
             const elD = document.getElementById("eleicoes-cd-d");
             const elH = document.getElementById("eleicoes-cd-h");
             const elM = document.getElementById("eleicoes-cd-m");
@@ -64,6 +80,7 @@
 
             if (!elD) return;
 
+<<<<<<< HEAD
             let targetTime = 0;
             let statusText = "Eleições 2026";
             let subText = "Acompanhe a apuração oficial →";
@@ -98,6 +115,16 @@
             if (subEl) subEl.textContent = subText;
 
             const distance = Math.max(0, targetTime - now);
+=======
+            if (distance < 0) {
+                elD.innerHTML = "00";
+                elH.innerHTML = "00";
+                elM.innerHTML = "00";
+                elS.innerHTML = "00";
+                return;
+            }
+
+>>>>>>> 82a4ad26265e16bed46541c79c86c12fcac0d450
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
