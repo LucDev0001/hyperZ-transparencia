@@ -9,11 +9,13 @@
   </div>
 
   <!-- Senator Details Modal -->
-  <div id="senatorModal" class="fixed inset-0 bg-black/80 z-[75] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+  <div id="senatorModal"
+       onclick="if(event.target===this){this.classList.add('hidden');document.body.style.overflow='';}"
+       class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="glass-panel rounded-3xl w-full max-w-4xl relative h-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <!-- Cabeçalho fixo -->
       <div class="flex items-center justify-end px-4 py-2 flex-shrink-0 border-b border-white/5">
-        <button onclick="document.getElementById('senatorModal').classList.add('hidden')" class="text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-700 rounded-full p-2 transition">
+        <button onclick="document.getElementById('senatorModal').classList.add('hidden');document.body.style.overflow='';" class="text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-700 rounded-full p-2 transition">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
       </div>
@@ -45,13 +47,13 @@
   <!-- Deputy Details Modal -->
   <div
     id="deputyModal"
-    onclick="if(event.target===this)this.classList.add('hidden')"
-    class="fixed inset-0 bg-black/80 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    onclick="if(event.target===this){this.classList.add('hidden');document.body.style.overflow='';}"
+    class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="glass-panel rounded-2xl w-full max-w-4xl relative max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <!-- Cabeçalho fixo com botão fechar — nunca sai da tela ao rolar -->
       <div class="flex items-center justify-end px-4 pt-3 pb-2 flex-shrink-0 border-b border-zinc-800/60">
         <button
-          onclick="document.getElementById('deputyModal').classList.add('hidden')"
+          onclick="document.getElementById('deputyModal').classList.add('hidden');document.body.style.overflow='';"
           class="text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-700 rounded-full p-1.5 transition"
           title="Fechar">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,3 +165,37 @@
       </div>
     </div>
   </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       SLIDE-OVER INSPECTOR DRAWER (Lateral SaaS Panel)
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="slideover-inspector-backdrop"
+       onclick="window.closeInspector()"
+       class="fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0"></div>
+
+  <aside id="slideover-inspector"
+         class="fixed top-0 right-0 h-full w-full sm:w-[520px] max-w-full z-[125] bg-zinc-950/95 border-l border-white/10 shadow-2xl backdrop-blur-2xl transition-transform duration-300 ease-out transform translate-x-full hidden flex flex-col">
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-zinc-900/60 flex-shrink-0">
+      <div class="flex items-center gap-3 min-w-0">
+        <img id="inspector-avatar" src="" alt="Foto" class="w-10 h-10 rounded-full border border-white/10 object-cover hidden flex-shrink-0" />
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h3 id="inspector-title" class="font-bold text-white text-base truncate">Detalhes</h3>
+            <span id="inspector-badge" class="hidden"></span>
+          </div>
+          <p id="inspector-subtitle" class="text-xs text-zinc-400 truncate mt-0.5"></p>
+        </div>
+      </div>
+      <button onclick="window.closeInspector()"
+              class="text-zinc-400 hover:text-white p-2 rounded-xl hover:bg-white/5 transition flex-shrink-0"
+              title="Fechar (ESC)">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div id="inspector-body" class="flex-1 overflow-y-auto p-5 space-y-4" style="scrollbar-width:thin;scrollbar-color:#3f3f46 transparent;">
+      <!-- Dynamic content / skeletons injected here -->
+    </div>
+  </aside>

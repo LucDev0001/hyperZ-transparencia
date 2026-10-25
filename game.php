@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../public_init.php';
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /entrar");
+    header("Location: " . (defined('BASE_PATH') ? BASE_PATH : '') . "/entrar");
     exit;
 }
 ?>

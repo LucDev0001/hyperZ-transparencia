@@ -39,11 +39,6 @@
       texto:  'Selecione um <strong>deputado ou senador</strong> e o sistema calcula automaticamente um <strong>score de risco</strong> com base em dados públicos: ausências, gastos atípicos, fornecedores suspeitos e ocorrências em bases de sanções.',
       dica:   'Score acima de 60 indica padrão que merece atenção. Acima de 80 é considerado crítico.',
     },
-    municipio: {
-      titulo: 'Como usar a seção Minha Cidade',
-      texto:  'Selecione seu <strong>estado e município</strong> para ver repasses federais, obras, servidores e representantes eleitos da sua região. Clique em "Salvar" para fixar sua cidade e acessar mais rápido nas próximas visitas.',
-      dica:   'Os dados incluem transferências constitucionais (FPM, SUS, educação) e convênios diretos.',
-    },
     viagens: {
       titulo: 'Como consultar Viagens a Serviço',
       texto:  'Pesquise por <strong>nome</strong> ou <strong>CPF</strong> para ver as viagens realizadas a serviço do governo e os valores de diárias pagos. Você pode filtrar por período e órgão para análises específicas.',

@@ -81,7 +81,7 @@ $presidents = [
             
             <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center">
                 <span class="text-[10px] text-zinc-600 font-bold uppercase">Vice: <span class="text-zinc-400"><?= $p['vice'] ?></span></span>
-                <button class="text-[10px] bg-violet-600/20 text-violet-400 px-3 py-1 rounded-lg font-bold border border-violet-600/30 hover:bg-violet-600 hover:text-white transition-all">Ver Detalhes ↗</button>
+                <button onclick='window.openPresidentDetails(<?= json_encode($p, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="text-[10px] bg-violet-600/20 text-violet-400 px-3 py-1 rounded-lg font-bold border border-violet-600/30 hover:bg-violet-600 hover:text-white transition-all">Ver Detalhes ↗</button>
             </div>
         </div>
         <?php endforeach; ?>

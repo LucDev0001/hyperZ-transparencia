@@ -1,4 +1,5 @@
 <!-- Scripts Modularizados -->
+<script src="<?php echo BASE_PATH; ?>/transparency/js/saas_ui.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/api.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/utils.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/company.js?v=<?php echo time(); ?>"></script>
@@ -7,13 +8,13 @@
 <script src="<?php echo BASE_PATH; ?>/transparency/js/parties.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/risk.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/elections.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo BASE_PATH; ?>/transparency/js/apuracao.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/presidents.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/tabs.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/map.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/comparison.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/corruption.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/network_graph.js?v=<?php echo time(); ?>"></script>
-<script src="<?php echo BASE_PATH; ?>/transparency/js/municipio.js?v=<?php echo time(); ?>"></script>
 <script src="<?php echo BASE_PATH; ?>/transparency/js/hyperbot.js?v=<?php echo time(); ?>"></script>
 
 <!-- ── Módulos de usabilidade (Etapas 6, 7, 9) ──────────────────────────── -->
@@ -40,11 +41,11 @@ function showRadarSubTab(name) {
     ['sancoes', 'pessoafisica', 'pessoajuridica', 'nepotismo', 'despesas', 'cruzamento'].forEach(t => {
         document.getElementById('rsub-' + t)?.classList.add('hidden');
         const btn = document.getElementById('rtab-' + t);
-        if (btn) btn.className = 'px-4 py-2 text-sm font-bold rounded-t-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition whitespace-nowrap';
+        if (btn) btn.className = 'px-3.5 py-2 font-medium rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition whitespace-nowrap flex items-center gap-1.5';
     });
     document.getElementById('rsub-' + name)?.classList.remove('hidden');
     const active = document.getElementById('rtab-' + name);
-    if (active) active.className = 'px-4 py-2 text-sm font-bold rounded-t-lg bg-red-600 text-white whitespace-nowrap';
+    if (active) active.className = 'px-3.5 py-2 font-bold rounded-xl bg-red-600 text-white shadow-md shadow-red-900/30 whitespace-nowrap flex items-center gap-1.5';
 }
 
 // ─── Online visitor counter ───────────────────────────────────────────────────
@@ -74,8 +75,10 @@ document.addEventListener('keydown', function(e) {
         var el = document.getElementById(id);
         if (el && !el.classList.contains('hidden')) el.classList.add('hidden');
     });
+    document.body.style.overflow = '';
     var share = document.getElementById('shareDeputyModal');
     if (share) share.remove();
+    if (typeof window.closeCommandPalette === 'function') window.closeCommandPalette();
     closeMoreDrawer();
 });
 
@@ -109,6 +112,7 @@ window.closeMoreDrawer = function() {
 // ─── Home Screen & customSwitchTab ────────────────────────────────────────────
 // Definir globalmente e imediatamente para evitar falha no clique mobile
 window.customSwitchTab = function(tab) {
+    if (tab === 'municipio') tab = 'home';
     const homeContent = document.getElementById('content-home');
     const allContent  = document.querySelectorAll('[id^="content-"]');
     const topbarHomeBtn      = document.getElementById('topbar-home-button-container');
@@ -158,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
         radar: 'radar', risco: 'radar', top_corrupcao: 'radar', rede: 'radar',
         gestao: 'gestao', orcamento: 'gestao', receitas: 'gestao',
         viagens: 'gestao', licitacoes: 'gestao', imoveis: 'gestao',
-        municipio: 'gestao',
     };
 
     window.updateBottomNav = function(activeTab) {
@@ -175,34 +178,36 @@ document.addEventListener('DOMContentLoaded', function() {
     window.updateDesktopSidebar = function(tab) {
         document.querySelectorAll('button[id^="tab-"]').forEach(btn => {
             const id = btn.id.replace('tab-', '');
-            let base = 'w-full text-left px-3 py-2 rounded-xl transition flex items-center gap-2 text-sm font-medium whitespace-nowrap border ';
-            let cls;
-            if (id === tab) {
-                if (id === 'risco' || id === 'radar' || id === 'top_corrupcao')
-                    cls = base + 'text-red-300 bg-red-900/40 border-red-500/30';
-                else if (id === 'mapa')
-                    cls = base + 'text-amber-300 bg-amber-900/40 border-amber-500/30';
-                else if (id === 'comparador')
-                    cls = base + 'text-blue-300 bg-blue-900/40 border-blue-500/30';
-                else if (id === 'rede')
-                    cls = base + 'text-violet-300 bg-violet-900/40 border-violet-500/30';
-                else
-                    cls = base + 'text-white bg-white/10 border-white/20';
+            const iconBox = btn.querySelector('.sidebar-icon-box');
+            const isActive = (id === tab);
+            let base = 'group w-full text-left px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-2.5 text-xs ';
+
+            if (isActive) {
+                if (id === 'risco' || id === 'radar' || id === 'top_corrupcao' || id === 'apuracao') {
+                    btn.className = base + 'font-bold text-red-300 bg-red-950/40 border border-red-500/30 shadow-sm shadow-red-900/20';
+                    if (iconBox) iconBox.className = 'sidebar-icon-box w-6 h-6 rounded-lg flex items-center justify-center bg-red-500/20 text-red-300 border border-red-500/30 flex-shrink-0';
+                } else if (id === 'mapa' || id === 'orcamento' || id === 'presidentes') {
+                    btn.className = base + 'font-bold text-amber-300 bg-amber-950/40 border border-amber-500/30 shadow-sm shadow-amber-900/20';
+                    if (iconBox) iconBox.className = 'sidebar-icon-box w-6 h-6 rounded-lg flex items-center justify-center bg-amber-500/20 text-amber-300 border border-amber-500/30 flex-shrink-0';
+                } else if (id === 'comparador' || id === 'noticias' || id === 'viagens') {
+                    btn.className = base + 'font-bold text-sky-300 bg-sky-950/40 border border-sky-500/30 shadow-sm shadow-sky-900/20';
+                    if (iconBox) iconBox.className = 'sidebar-icon-box w-6 h-6 rounded-lg flex items-center justify-center bg-sky-500/20 text-sky-300 border border-sky-500/30 flex-shrink-0';
+                } else if (id === 'rede' || id === 'politicos' || id === 'senadores' || id === 'partidos') {
+                    btn.className = base + 'font-bold text-violet-300 bg-violet-950/40 border border-violet-500/30 shadow-sm shadow-violet-900/20';
+                    if (iconBox) iconBox.className = 'sidebar-icon-box w-6 h-6 rounded-lg flex items-center justify-center bg-violet-500/20 text-violet-300 border border-violet-500/30 flex-shrink-0';
+                } else if (id === 'gestao' || id === 'pautas_gz' || id === 'licitacoes') {
+                    btn.className = base + 'font-bold text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 shadow-sm shadow-emerald-900/20';
+                    if (iconBox) iconBox.className = 'sidebar-icon-box w-6 h-6 rounded-lg flex items-center justify-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex-shrink-0';
+                } else {
+                    btn.className = base + 'font-bold text-white bg-white/10 border border-white/20 shadow-sm';
+                    if (iconBox) iconBox.className = 'sidebar-icon-box w-6 h-6 rounded-lg flex items-center justify-center bg-white/15 text-white border border-white/20 flex-shrink-0';
+                }
             } else {
-                if (id === 'risco' || id === 'radar' || id === 'top_corrupcao')
-                    cls = base + 'text-red-400 hover:bg-red-900/20 hover:text-red-300 border-transparent';
-                else if (id === 'mapa')
-                    cls = base + 'text-amber-400 hover:bg-amber-900/20 hover:text-amber-300 border-transparent';
-                else if (id === 'comparador')
-                    cls = base + 'text-blue-400 hover:bg-blue-900/20 hover:text-blue-300 border-transparent';
-                else if (id === 'rede')
-                    cls = base + 'text-violet-400 hover:bg-violet-900/20 hover:text-violet-300 border-transparent';
-                else
-                    cls = base + 'text-zinc-400 hover:bg-white/5 hover:text-white border-transparent';
+                btn.className = base + 'font-medium text-zinc-400 hover:bg-white/[0.04] hover:text-white border border-transparent';
+                if (iconBox) iconBox.className = 'sidebar-icon-box w-6 h-6 rounded-lg flex items-center justify-center bg-white/[0.04] text-zinc-400 group-hover:text-white border border-white/5 transition flex-shrink-0';
             }
-            btn.className = cls;
         });
-    }
+    };
 
     // Inicializa tela home
     if (!document.querySelector('[id^="content-"]:not(.hidden)')) {

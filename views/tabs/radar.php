@@ -2,21 +2,26 @@
 <div id="content-radar" class="hidden animate-fade-in">
 
 <!-- Header -->
-<div class="glass-panel rounded-2xl p-6 mb-6 border border-red-900/30 bg-red-950/10">
+<div class="glass-panel rounded-2xl p-6 mb-6 border border-red-500/20 bg-gradient-to-r from-red-950/30 to-zinc-900/40 shadow-xl">
   <div class="flex items-start gap-4">
-    <span class="text-4xl">🔍</span>
+    <div class="w-12 h-12 rounded-2xl bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 flex-shrink-0 shadow-lg shadow-red-950/40">
+      <?= getSaaSIcon('radar', 'w-6 h-6') ?>
+    </div>
     <div>
-      <h2 class="text-2xl font-black text-white">Radar Anti-Corrupção</h2>
-      <p class="text-zinc-400 text-sm mt-1 max-w-2xl">
-        Varredura em <strong class="text-white">5 bases de dados oficiais</strong> do Governo Federal simultaneamente: CNEP, CEIS, CEAF, CEPIM e PEP.
-        Consultas são feitas em tempo real via <em>Portal da Transparência</em> (Lei nº 12.527/2011 — LAI).
+      <div class="flex items-center gap-2">
+        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Radar Anti-Corrupção</h2>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 font-bold uppercase">5 Bases Ativas</span>
+      </div>
+      <p class="text-zinc-400 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+        Varredura simultânea em <strong class="text-white">5 bases de dados oficiais</strong> do Governo Federal: CNEP, CEIS, CEAF, CEPIM e PEP.
+        Consultas em tempo real via <em>Portal da Transparência</em> (Lei nº 12.527/2011 — LAI).
       </p>
-      <div class="flex flex-wrap gap-2 mt-3">
-        <span class="text-[10px] px-2 py-1 rounded bg-red-950 text-red-300 border border-red-800 font-bold">CNEP — Empresas Punidas</span>
-        <span class="text-[10px] px-2 py-1 rounded bg-orange-950 text-orange-300 border border-orange-800 font-bold">CEIS — Empresas Inidôneas</span>
-        <span class="text-[10px] px-2 py-1 rounded bg-red-950 text-red-300 border border-red-800 font-bold">CEAF — Expulsões Federais</span>
-        <span class="text-[10px] px-2 py-1 rounded bg-orange-950 text-orange-300 border border-orange-800 font-bold">CEPIM — ONGs Impedidas</span>
-        <span class="text-[10px] px-2 py-1 rounded bg-blue-950 text-blue-300 border border-blue-800 font-bold">PEP — Pessoas Expostas Politicamente</span>
+      <div class="flex flex-wrap gap-1.5 mt-3">
+        <span class="text-[10px] px-2 py-0.5 rounded-md bg-red-950/60 text-red-300 border border-red-800/60 font-semibold">CNEP — Empresas Punidas</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-md bg-orange-950/60 text-orange-300 border border-orange-800/60 font-semibold">CEIS — Empresas Inidôneas</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-md bg-red-950/60 text-red-300 border border-red-800/60 font-semibold">CEAF — Expulsões Federais</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-md bg-orange-950/60 text-orange-300 border border-orange-800/60 font-semibold">CEPIM — ONGs Impedidas</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-md bg-blue-950/60 text-blue-300 border border-blue-800/60 font-semibold">PEP — Expostos Politicamente</span>
       </div>
     </div>
   </div>
@@ -32,13 +37,31 @@
 </div>
 
 <!-- Tabs internas -->
-<div class="flex gap-2 mb-6 border-b border-zinc-800 pb-2 overflow-x-auto">
-  <button onclick="showRadarSubTab('sancoes')" id="rtab-sancoes" class="px-4 py-2 text-sm font-bold rounded-t-lg bg-red-600 text-white whitespace-nowrap">🚨 Varredura de Sanções</button>
-  <button onclick="showRadarSubTab('pessoafisica')" id="rtab-pessoafisica" class="px-4 py-2 text-sm font-bold rounded-t-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition whitespace-nowrap">👤 Raio-X Pessoa Física</button>
-  <button onclick="showRadarSubTab('pessoajuridica')" id="rtab-pessoajuridica" class="px-4 py-2 text-sm font-bold rounded-t-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition whitespace-nowrap">🏢 Raio-X Empresa</button>
-  <button onclick="showRadarSubTab('nepotismo')" id="rtab-nepotismo" class="px-4 py-2 text-sm font-bold rounded-t-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition whitespace-nowrap">👥 Detector de Nepotismo</button>
-  <button onclick="showRadarSubTab('despesas')" id="rtab-despesas" class="px-4 py-2 text-sm font-bold rounded-t-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition whitespace-nowrap">💸 Análise de Despesas</button>
-  <button onclick="showRadarSubTab('cruzamento')" id="rtab-cruzamento" class="px-4 py-2 text-sm font-bold rounded-t-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition whitespace-nowrap">🔗 Cruzamento PF×PJ</button>
+<div class="flex gap-1.5 mb-6 border-b border-white/5 pb-2 overflow-x-auto scrollbar-hide text-xs">
+  <button onclick="showRadarSubTab('sancoes')" id="rtab-sancoes" class="px-3.5 py-2 font-bold rounded-xl bg-red-600 text-white shadow-md shadow-red-900/30 transition whitespace-nowrap flex items-center gap-1.5">
+    <?= getSaaSIcon('alert', 'w-3.5 h-3.5') ?>
+    <span>Varredura de Sanções</span>
+  </button>
+  <button onclick="showRadarSubTab('pessoafisica')" id="rtab-pessoafisica" class="px-3.5 py-2 font-medium rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition whitespace-nowrap flex items-center gap-1.5">
+    <?= getSaaSIcon('user', 'w-3.5 h-3.5') ?>
+    <span>Raio-X Pessoa Física</span>
+  </button>
+  <button onclick="showRadarSubTab('pessoajuridica')" id="rtab-pessoajuridica" class="px-3.5 py-2 font-medium rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition whitespace-nowrap flex items-center gap-1.5">
+    <?= getSaaSIcon('building', 'w-3.5 h-3.5') ?>
+    <span>Raio-X Empresa</span>
+  </button>
+  <button onclick="showRadarSubTab('nepotismo')" id="rtab-nepotismo" class="px-3.5 py-2 font-medium rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition whitespace-nowrap flex items-center gap-1.5">
+    <?= getSaaSIcon('users', 'w-3.5 h-3.5') ?>
+    <span>Detector de Nepotismo</span>
+  </button>
+  <button onclick="showRadarSubTab('despesas')" id="rtab-despesas" class="px-3.5 py-2 font-medium rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition whitespace-nowrap flex items-center gap-1.5">
+    <?= getSaaSIcon('coins', 'w-3.5 h-3.5') ?>
+    <span>Análise de Despesas</span>
+  </button>
+  <button onclick="showRadarSubTab('cruzamento')" id="rtab-cruzamento" class="px-3.5 py-2 font-medium rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition whitespace-nowrap flex items-center gap-1.5">
+    <?= getSaaSIcon('network', 'w-3.5 h-3.5') ?>
+    <span>Cruzamento PF×PJ</span>
+  </button>
 </div>
 
 <!-- Sub-tab: Sanções -->

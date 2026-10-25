@@ -28,11 +28,11 @@
             </div>
             <div>
                 <label class="text-xs font-bold text-zinc-500 uppercase">Vigência De</label>
-                <input type="date" id="licitacao-data-ini" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
+                <input type="date" id="licitacao-data-ini" value="<?= date('Y-m-d', strtotime('-90 days')) ?>" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
             </div>
             <div>
                 <label class="text-xs font-bold text-zinc-500 uppercase">Vigência Até</label>
-                <input type="date" id="licitacao-data-fim" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
+                <input type="date" id="licitacao-data-fim" value="<?= date('Y-m-d') ?>" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
             </div>
             <div>
                 <label class="text-xs font-bold text-zinc-500 uppercase">Objeto (filtro)</label>

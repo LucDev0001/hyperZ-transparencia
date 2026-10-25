@@ -1,46 +1,50 @@
-<div id="content-pautas_gz" class="content-panel hidden p-4 sm:p-6 max-w-4xl mx-auto">
+<div id="content-pautas_gz" class="content-panel hidden p-4 sm:p-6 max-w-4xl mx-auto pb-16">
 
-  <!-- Header -->
-  <div class="flex items-start justify-between gap-4 mb-6">
+  <!-- SaaS Header -->
+  <div class="flex items-start justify-between gap-4 mb-8">
     <div>
       <div class="flex items-center gap-2 mb-2">
-        <div class="w-8 h-8 rounded-xl bg-green-900/30 border border-green-700/40 flex items-center justify-center text-base">🤝</div>
-        <h2 class="text-xl font-black text-white">Pautas GZ</h2>
-        <span class="text-[10px] font-bold bg-green-900/40 text-green-400 border border-green-700/40 px-2 py-0.5 rounded-full uppercase tracking-wide">Parceria</span>
+        <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <?php echo function_exists('getSaaSIcon') ? getSaaSIcon('shield', 'w-4 h-4') : '🤝'; ?>
+        </div>
+        <h2 class="text-2xl font-black text-white tracking-tight">Pautas GZ</h2>
+        <span class="text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wide">
+          Movimento Cívico
+        </span>
       </div>
-      <p class="text-zinc-400 text-sm">Políticos e votações monitorados pelo <strong class="text-green-400">Movimento Geração Z BR</strong> — com dados reais do Portal de Transparência.</p>
+      <p class="text-zinc-400 text-sm">Políticos e matérias legislativas monitoradas pela comunidade <strong class="text-emerald-400">Geração Z Brasil</strong> com cruzamento de dados oficiais.</p>
     </div>
     <a href="https://t.me/ograndedia" target="_blank" rel="noopener"
-       class="flex-shrink-0 flex items-center gap-1.5 text-xs bg-green-900/30 hover:bg-green-900/50 border border-green-700/40 text-green-400 px-3 py-1.5 rounded-lg transition">
+       class="flex-shrink-0 flex items-center gap-2 text-xs bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-xl transition font-mono font-bold shadow-sm">
       <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-      Telegram
+      Telegram Oficial
     </a>
   </div>
 
   <!-- Stats bar -->
-  <div id="gz-stats-bar" class="grid grid-cols-3 gap-3 mb-6">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-center">
-      <div class="text-xl font-black text-green-400" id="gz-stat-pautas">—</div>
-      <div class="text-zinc-500 text-xs mt-0.5">Pautas ativas</div>
+  <div id="gz-stats-bar" class="grid grid-cols-3 gap-4 mb-8">
+    <div class="glass-card rounded-2xl p-4 text-center border border-white/10">
+      <div class="text-2xl font-black text-emerald-400 font-mono" id="gz-stat-pautas">—</div>
+      <div class="text-zinc-500 text-xs mt-1 font-mono uppercase tracking-wider">Pautas Ativas</div>
     </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-center">
-      <div class="text-xl font-black text-violet-400" id="gz-stat-politicos">—</div>
-      <div class="text-zinc-500 text-xs mt-0.5">Políticos monitorados</div>
+    <div class="glass-card rounded-2xl p-4 text-center border border-white/10">
+      <div class="text-2xl font-black text-violet-400 font-mono" id="gz-stat-politicos">—</div>
+      <div class="text-zinc-500 text-xs mt-1 font-mono uppercase tracking-wider">Alvos Rastreados</div>
     </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-center">
-      <div class="text-xl font-black text-white" id="gz-stat-aliados">—</div>
-      <div class="text-zinc-500 text-xs mt-0.5">Aliados na plataforma</div>
+    <div class="glass-card rounded-2xl p-4 text-center border border-white/10">
+      <div class="text-2xl font-black text-white font-mono" id="gz-stat-aliados">—</div>
+      <div class="text-zinc-500 text-xs mt-1 font-mono uppercase tracking-wider">Cidadãos Aliados</div>
     </div>
   </div>
 
   <!-- Loading skeleton -->
   <div id="gz-skeleton" class="space-y-3">
-    <?php for ($i = 0; $i < 4; $i++): ?>
-    <div class="animate-pulse bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex gap-3">
-      <div class="w-10 h-10 bg-zinc-800 rounded-xl flex-shrink-0"></div>
+    <?php for ($i = 0; $i < 3; $i++): ?>
+    <div class="glass-card rounded-2xl p-4 flex gap-3 border border-white/5">
+      <div class="w-10 h-10 skeleton-box rounded-xl flex-shrink-0"></div>
       <div class="flex-1 space-y-2">
-        <div class="h-3 bg-zinc-800 rounded w-1/2"></div>
-        <div class="h-2 bg-zinc-800 rounded w-3/4"></div>
+        <div class="h-4 skeleton-box rounded w-1/3"></div>
+        <div class="h-3 skeleton-box rounded w-2/3"></div>
       </div>
     </div>
     <?php endfor; ?>
@@ -66,7 +70,7 @@
         <p class="font-bold text-white text-sm mb-1">Faça parte do movimento</p>
         <p class="text-zinc-500 text-xs">Crie sua conta no Hyper Z com o link do movimento e ganhe o badge <span class="text-green-400">🤝 Aliado GZ BR</span> no seu perfil.</p>
       </div>
-      <a href="/aliado_gz.php"
+      <a href="<?php echo BASE_PATH; ?>/aliado_gz.php"
          class="flex-shrink-0 bg-green-700 hover:bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl transition text-sm whitespace-nowrap">
         Ser um Aliado →
       </a>
@@ -93,7 +97,7 @@
 
   async function loadPautasGZ() {
     try {
-      const res = await fetch('/api.php?action=list_pautas_gz_public');
+      const res = await fetch((window.BASE_PATH || '') + '/api.php?action=list_pautas_gz_public');
       const data = await res.json();
 
       document.getElementById('gz-skeleton').classList.add('hidden');
@@ -113,8 +117,8 @@
       list.innerHTML = pautas.map(p => {
         const icon = TYPE_ICONS[p.politician_type] || '🏙️';
         const cc   = catClass(p.category);
-        const highlightBorder = p.highlight == 1 ? 'border-green-700/50 bg-green-900/5' : 'border-zinc-800';
-        const badge = p.highlight == 1 ? `<span class="text-[10px] font-bold bg-green-900/40 text-green-400 border border-green-700/40 px-1.5 py-0.5 rounded-full">Em destaque</span>` : '';
+        const highlightBorder = p.highlight == 1 ? 'border-emerald-500/40 bg-emerald-950/20' : 'border-white/10';
+        const badge = p.highlight == 1 ? `<span class="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase">Em destaque</span>` : '';
 
         let linkBtn = '';
         if (p.politician_name) {
@@ -124,15 +128,15 @@
               data-polname="${escHtml(p.politician_name)}"
               data-poltype="${escHtml(p.politician_type)}"
               onclick="openGZPolitician(this)"
-              class="inline-flex items-center gap-1 text-xs font-semibold ${colorClass} hover:underline">
+              class="inline-flex items-center gap-1.5 text-xs font-semibold ${colorClass} hover:underline font-mono">
               <svg style="width:11px;height:11px;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               ${label}</button>`;
         }
 
         return `
-          <div class="bg-zinc-900 border ${highlightBorder} rounded-xl p-4 transition hover:border-green-700/30">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xl flex-shrink-0">${icon}</div>
+          <div class="glass-card rounded-2xl p-4 transition border ${highlightBorder} shadow-sm">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center text-xl flex-shrink-0 shadow-sm">${icon}</div>
               <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-1.5 mb-1">
                   <span class="font-bold text-white text-sm">${escHtml(p.title)}</span>

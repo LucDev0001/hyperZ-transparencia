@@ -43,17 +43,48 @@ $is_logged_in = isset($_SESSION['user_id']);
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <!-- Vis-Network (Grafos do Radar) -->
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       background-color: #09090b;
       color: #e4e4e7;
-      background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.15), transparent 40%);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.12), transparent 45%),
+        radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.06), transparent 40%);
     }
     
     .glass-panel {
-      background: rgba(24, 24, 27, 0.6);
-      backdrop-filter: blur(12px);
+      background: rgba(24, 24, 27, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(139, 92, 246, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -10px rgba(124, 58, 237, 0.18);
+    }
+
+    /* Skeleton shimmer loader */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton-box {
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 37%, rgba(255,255,255,0.04) 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      border-radius: 8px;
     }
 
     ::-webkit-scrollbar {

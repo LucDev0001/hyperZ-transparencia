@@ -12,29 +12,6 @@ window.switchTab = function (tab) {
     .querySelectorAll('[id^="content-"]')
     .forEach((el) => el.classList.add("hidden"));
 
-  // Reset all tab buttons to inactive style
-  document.querySelectorAll('button[id^="tab-"]').forEach((btn) => {
-    const id = btn.id;
-    if (id === "tab-risco")
-      btn.className =
-        _BASE + " text-red-400 hover:text-red-300 hover:bg-red-900/20";
-    else if (id === "tab-radar")
-      btn.className =
-        _BASE + " text-red-400 hover:text-red-300 hover:bg-red-900/20";
-    else if (id === "tab-top_corrupcao")
-      btn.className =
-        _BASE + " text-red-400 hover:text-red-300 hover:bg-red-900/20";
-    else if (id === "tab-mapa")
-      btn.className =
-        _BASE + " text-amber-400 hover:text-amber-300 hover:bg-amber-900/20";
-    else if (id === "tab-comparador")
-      btn.className =
-        _BASE + " text-blue-400 hover:text-blue-300 hover:bg-blue-900/20";
-    else
-      btn.className =
-        _BASE + " text-zinc-400 hover:text-white hover:bg-white/5";
-  });
-
   // Show active content
   const content = document.getElementById(`content-${tab}`);
   if (content) content.classList.remove("hidden");
@@ -43,32 +20,9 @@ window.switchTab = function (tab) {
   const mainEl = document.querySelector("main");
   if (mainEl) mainEl.scrollTop = 0;
 
-  // Set active button style
-  const activeBtn = document.getElementById(`tab-${tab}`);
-  if (activeBtn) {
-    if (tab === "risco")
-      activeBtn.className =
-        _ACTIVE +
-        " bg-red-900/25 text-red-400 border border-red-500/50 shadow-sm";
-    else if (tab === "radar")
-      activeBtn.className =
-        _ACTIVE +
-        " bg-red-900/25 text-red-400 border border-red-500/50 shadow-sm";
-    else if (tab === "top_corrupcao")
-      activeBtn.className =
-        _ACTIVE +
-        " bg-red-900/25 text-red-400 border border-red-500/50 shadow-sm";
-    else if (tab === "mapa")
-      activeBtn.className =
-        _ACTIVE +
-        " bg-amber-900/20 text-amber-400 border border-amber-500/40 shadow-sm";
-    else if (tab === "comparador")
-      activeBtn.className =
-        _ACTIVE +
-        " bg-blue-900/20 text-blue-400 border border-blue-500/40 shadow-sm";
-    else
-      activeBtn.className =
-        _ACTIVE + " bg-zinc-800 text-white border border-zinc-700 shadow-sm";
+  // Set active button style via centralized updateDesktopSidebar
+  if (typeof window.updateDesktopSidebar === "function") {
+    window.updateDesktopSidebar(tab);
   }
 
   // On-demand loading
@@ -83,7 +37,6 @@ window.switchTab = function (tab) {
   if (tab === "noticias" && typeof window.loadPoliticalNews === "function")
     window.loadPoliticalNews();
   if (tab === "gestao" && typeof window.loadFederalExpenses === "function") {
-    setFilterMode("ano");
     window.loadFederalExpenses();
   }
   if (tab === "outros" && typeof window.loadYearsOptions === "function")
@@ -98,6 +51,28 @@ window.switchTab = function (tab) {
     window.loadTseDatasets();
   if (tab === "eleicoes" && typeof window.updateRoleSelect === "function")
     window.updateRoleSelect(window.currentElectionYear || 2022);
+
+  if (tab === "apuracao") {
+    if (window.Apuracao) {
+      if (!window.Apuracao.map) window.Apuracao.init();
+      window.Apuracao.fetchResults();
+      if (!window.Apuracao.intervalId) {
+        window.Apuracao.intervalId = setInterval(() => window.Apuracao.fetchResults(), 30000);
+      }
+      setTimeout(() => { if (window.Apuracao.map) window.Apuracao.map.invalidateSize(); }, 300);
+      if (window.ApuracaoChat && typeof window.ApuracaoChat.checkState === "function") {
+        window.ApuracaoChat.checkState();
+      }
+    }
+  } else {
+    if (window.Apuracao && window.Apuracao.intervalId) {
+      clearInterval(window.Apuracao.intervalId);
+      window.Apuracao.intervalId = null;
+    }
+    if (window.ApuracaoChat && typeof window.ApuracaoChat.stopPolling === "function") {
+      window.ApuracaoChat.stopPolling();
+    }
+  }
 
   if (tab === "mapa" && typeof window.initSpendingMap === "function") {
     setTimeout(() => window.initSpendingMap(), 100);
@@ -154,9 +129,6 @@ window.switchTab = function (tab) {
   }
   if (tab === "top_corrupcao") {
     // A análise é manual, não faz nada ao abrir
-  }
-  if (tab === "municipio") {
-    // Nothing to auto-load — user triggers search manually
   }
 
   // Set default date inputs

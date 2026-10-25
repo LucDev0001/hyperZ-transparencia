@@ -794,7 +794,7 @@
         bot("positivo", `📍 Cidade registrada: ${cidade}`,
           `Agora sei que você é de <strong>${cidade}</strong>. Posso buscar dados do seu município ou encontrar seu deputado federal.`);
         mostrarChips([
-          { emoji: "🏘️", label: `Dados de ${cidade}`,    acao: () => executar("abrir_aba", "municipio") },
+          { emoji: "🗺️", label: "Mapa de Gastos",       acao: () => executar("abrir_aba", "mapa") },
           { emoji: "👔", label: "Meu deputado federal",  acao: () => executar("buscar_deputado", cidade) },
           { emoji: "💰", label: "Gastos federais",       acao: () => executar("abrir_aba", "orcamento") },
         ]);
@@ -891,15 +891,10 @@
         executar("scan_cpf", intent.digits, raw);
         break;
 
-      // ── Município ────────────────────────────────────────────────────────
+      // ── Município / Repasses ──────────────────────────────────────────────
       case "municipio":
-        if (profile.municipio) {
-          bot("info", `🏘️ Dados de ${profile.municipio}`, "Abrindo a seção de dados municipais...");
-          executar("abrir_aba", "municipio");
-        } else {
-          bot("info", "🏘️ Qual cidade?", "Me diga o nome da cidade para buscar os dados.<br>Ex: <em>\"Sou de Ribeirão Preto\"</em>");
-          ctx.aguardandoResposta = "config_cidade";
-        }
+        bot("info", "🗺️ Mapa de Gastos e Repasses", "Acompanhe os repasses e transferências federais por estado e região no <strong>Mapa de Gastos</strong>.");
+        executar("abrir_aba", "mapa");
         break;
 
       // ── Nepotismo ────────────────────────────────────────────────────────

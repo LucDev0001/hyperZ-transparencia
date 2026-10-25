@@ -1344,7 +1344,7 @@ $is_logged_in = isset($_SESSION['user_id']);
     input.value = '';
     appendMsg(q, 'user');
     document.getElementById('bot-typing').classList.remove('hidden');
-    fetch('/api.php?action=wiki_bot', {
+    fetch((window.BASE_PATH || '') + '/api.php?action=wiki_bot', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question: q })

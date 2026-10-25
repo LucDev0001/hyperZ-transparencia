@@ -28,11 +28,11 @@
             </div>
             <div>
                 <label class="text-xs font-bold text-zinc-500 uppercase">Saída De</label>
-                <input type="date" id="viagem-data-ini" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
+                <input type="date" id="viagem-data-ini" value="<?= date('Y-m-d', strtotime('-30 days')) ?>" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
             </div>
             <div>
                 <label class="text-xs font-bold text-zinc-500 uppercase">Saída Até</label>
-                <input type="date" id="viagem-data-fim" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
+                <input type="date" id="viagem-data-fim" value="<?= date('Y-m-d') ?>" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-4 py-2 mt-1 outline-none focus:border-violet-500">
             </div>
             <div>
                 <label class="text-xs font-bold text-zinc-500 uppercase">Nome do Servidor</label>

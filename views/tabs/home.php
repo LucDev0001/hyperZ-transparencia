@@ -1,6 +1,117 @@
 <!-- Tela Inicial (Dashboard) -->
 <div id="content-home" class="hidden animate-fade-in">
     
+    <!-- Widget Eleições 2026 -->
+    <div onclick="window.customSwitchTab('apuracao')" class="cursor-pointer group relative mb-6 rounded-3xl border border-red-500/30 bg-gradient-to-r from-red-950/40 to-zinc-900/40 overflow-hidden shadow-[0_0_40px_rgba(220,38,38,0.15)] hover:shadow-[0_0_60px_rgba(220,38,38,0.3)] hover:border-red-500/60 transition-all duration-500 flex flex-col md:flex-row items-center justify-between p-6 md:p-8">
+        <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors pointer-events-none"></div>
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-red-600/20 blur-[100px] rounded-full pointer-events-none"></div>
+        
+        <div class="relative z-10 flex items-center gap-5 mb-6 md:mb-0 w-full md:w-auto justify-center md:justify-start">
+            <div class="relative flex h-14 w-14 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
+                <div class="relative inline-flex rounded-full h-14 w-14 bg-red-950 border border-red-500/50 items-center justify-center text-red-500 text-2xl shadow-inner">
+                    🗳️
+                </div>
+            </div>
+            <div class="text-center md:text-left">
+                <h3 id="eleicoes-widget-title" class="text-white font-black text-xl lg:text-2xl uppercase tracking-tighter flex items-center justify-center md:justify-start gap-2 italic">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    Eleições 2026
+                </h3>
+                <p id="eleicoes-widget-subtitle" class="text-red-400/80 text-xs font-bold uppercase tracking-[0.2em] mt-1 group-hover:text-red-400 transition-colors">Acompanhe a apuração oficial →</p>
+            </div>
+        </div>
+
+        <div class="relative z-10 flex gap-2 sm:gap-3 text-center shrink-0">
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-xl">
+                <div id="eleicoes-cd-d" class="text-2xl sm:text-3xl font-black text-white tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Dias</div>
+            </div>
+            <div class="flex items-center text-white/20 font-black text-2xl mb-4">:</div>
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-xl">
+                <div id="eleicoes-cd-h" class="text-2xl sm:text-3xl font-black text-white tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Hrs</div>
+            </div>
+            <div class="flex items-center text-white/20 font-black text-2xl mb-4">:</div>
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-xl">
+                <div id="eleicoes-cd-m" class="text-2xl sm:text-3xl font-black text-white tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Min</div>
+            </div>
+            <div class="flex items-center text-white/20 font-black text-2xl mb-4">:</div>
+            <div class="bg-red-950/40 backdrop-blur-md border border-red-500/30 rounded-2xl px-3 sm:px-5 py-3 w-16 sm:w-20 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
+                <div id="eleicoes-cd-s" class="text-2xl sm:text-3xl font-black text-red-400 tracking-tighter">00</div>
+                <div class="text-[8px] sm:text-[9px] text-red-500/70 font-bold uppercase tracking-widest mt-1">Seg</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function updateElectionCountdown() {
+            // Calendário Oficial TSE 2026:
+            // 1º Turno: 04/10/2026 08:00 às 17:00
+            // 2º Turno: 25/10/2026 08:00 às 17:00
+            const t1Start = new Date("2026-10-04T08:00:00-03:00").getTime();
+            const t1End   = new Date("2026-10-04T17:00:00-03:00").getTime();
+            const t2Start = new Date("2026-10-25T08:00:00-03:00").getTime();
+            const t2End   = new Date("2026-10-25T17:00:00-03:00").getTime();
+            const now = new Date().getTime();
+
+            const titleEl = document.getElementById("eleicoes-widget-title");
+            const subEl = document.getElementById("eleicoes-widget-subtitle");
+            const elD = document.getElementById("eleicoes-cd-d");
+            const elH = document.getElementById("eleicoes-cd-h");
+            const elM = document.getElementById("eleicoes-cd-m");
+            const elS = document.getElementById("eleicoes-cd-s");
+
+            if (!elD) return;
+
+            let targetTime = 0;
+            let statusText = "Eleições 2026";
+            let subText = "Acompanhe a apuração oficial →";
+
+            if (now < t1Start) {
+                targetTime = t1Start;
+                statusText = "Eleições 2026 · 1º Turno";
+                subText = "Contagem regressiva para abertura das urnas →";
+            } else if (now >= t1Start && now <= t1End) {
+                targetTime = t1End;
+                statusText = "Eleições 2026 · 1º Turno AO VIVO";
+                subText = "Votação e Apuração em tempo real →";
+            } else if (now > t1End && now < t2Start) {
+                targetTime = t2Start;
+                statusText = "Eleições 2026 · 2º Turno";
+                subText = "Decisão Presidencial e Governos Estaduais →";
+            } else if (now >= t2Start && now <= t2End) {
+                targetTime = t2End;
+                statusText = "Eleições 2026 · 2º Turno AO VIVO";
+                subText = "Apuração Oficial TSE em tempo real →";
+            } else {
+                if (titleEl) titleEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Eleições 2026 · Apuração Oficial`;
+                if (subEl) subEl.textContent = "Apuração concluída · Ver dados e gráficos do TSE →";
+                elD.innerHTML = "100%";
+                elH.innerHTML = "TSE";
+                elM.innerHTML = "FIM";
+                elS.innerHTML = "✓";
+                return;
+            }
+
+            if (titleEl) titleEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> ${statusText}`;
+            if (subEl) subEl.textContent = subText;
+
+            const distance = Math.max(0, targetTime - now);
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            elD.innerHTML = days.toString().padStart(2, '0');
+            elH.innerHTML = hours.toString().padStart(2, '0');
+            elM.innerHTML = minutes.toString().padStart(2, '0');
+            elS.innerHTML = seconds.toString().padStart(2, '0');
+        }
+        setInterval(updateElectionCountdown, 1000);
+        setTimeout(updateElectionCountdown, 100);
+    </script>
+
     <!-- Hero Section -->
     <div class="relative mb-10 rounded-3xl border border-white/10 bg-zinc-900/50 p-6 sm:p-10 lg:p-12 text-center lg:text-left flex flex-col lg:flex-row items-center gap-8 shadow-2xl">
         <div class="absolute inset-0 bg-gradient-to-br from-violet-600/20 to-indigo-600/10 pointer-events-none rounded-3xl overflow-hidden"></div>
@@ -18,7 +129,9 @@
             <div class="relative max-w-2xl mx-auto lg:mx-0 group z-50">
                 <div class="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl blur opacity-25 group-focus-within:opacity-60 transition duration-500"></div>
                 <div class="relative flex items-center bg-zinc-900 border border-white/10 rounded-2xl p-1.5 sm:p-2 focus-within:border-violet-500/50 transition-colors">
-                    <span class="pl-3 sm:pl-4 text-zinc-500">🔍</span>
+                    <span class="pl-3 sm:pl-4 text-zinc-500 flex-shrink-0">
+                        <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
+                    </span>
                     <input type="text" id="globalSearchInput" placeholder="Nome, CNPJ, empresa ou investigação pública..."
                            class="w-full bg-transparent py-2.5 sm:py-3 pl-3 pr-4 text-white text-sm sm:text-base outline-none placeholder-zinc-600" autocomplete="off" />
                     <button class="bg-violet-600 hover:bg-violet-500 text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm transition-colors hidden sm:block">
@@ -86,44 +199,56 @@
         <p class="text-[10px] text-zinc-500 mt-2">Score de Risco · Sanções · Contratos · Sócios · Alertas</p>
     </div>
 
-    <!-- ══ Etapa 5: Acesso Rápido — visível em todos os tamanhos de tela ══ -->
+    <!-- ══ Acesso Rápido SaaS — 4 Pilares Centrais ══ -->
     <div class="mb-10">
-      <h2 class="text-base font-bold text-zinc-400 uppercase tracking-wider mb-4">O que você quer fazer?</h2>
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Acesso Rápido às Ferramentas</h2>
+        <span class="text-[10px] font-mono text-zinc-500">Pressione <kbd class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">Ctrl K</kbd> para busca universal</span>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
 
         <button onclick="window.customSwitchTab('politicos')"
-                class="group glass-panel rounded-2xl p-4 text-left border border-white/5 hover:border-violet-500/40 hover:bg-violet-500/5 transition-all duration-200 flex flex-col gap-3">
-          <span class="text-3xl leading-none">👔</span>
+                class="group glass-card rounded-2xl p-4 sm:p-5 text-left border border-white/5 hover:border-violet-500/40 hover:bg-violet-950/20 transition-all duration-200 flex flex-col justify-between gap-4">
+          <div class="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
+            <?= getSaaSIcon('user', 'w-5 h-5') ?>
+          </div>
           <div>
-            <div class="font-bold text-white text-sm group-hover:text-violet-300 transition-colors">Ver meu Deputado</div>
-            <div class="text-zinc-500 text-xs mt-1 leading-tight">Gastos, votos e presença</div>
+            <div class="font-bold text-white text-sm group-hover:text-violet-300 transition-colors">Parlamento & Votos</div>
+            <div class="text-zinc-500 text-xs mt-1 leading-tight">Gastos, assiduidade e votações</div>
           </div>
         </button>
 
         <button onclick="window.customSwitchTab('radar');if(typeof window.initRadarTab==='function')window.initRadarTab();"
-                class="group glass-panel rounded-2xl p-4 text-left border border-white/5 hover:border-red-500/40 hover:bg-red-500/5 transition-all duration-200 flex flex-col gap-3">
-          <span class="text-3xl leading-none">🔍</span>
+                class="group glass-card rounded-2xl p-4 sm:p-5 text-left border border-white/5 hover:border-red-500/40 hover:bg-red-950/20 transition-all duration-200 flex flex-col justify-between gap-4">
+          <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 group-hover:scale-110 transition-transform relative">
+            <?= getSaaSIcon('radar', 'w-5 h-5') ?>
+            <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+          </div>
           <div>
-            <div class="font-bold text-white text-sm group-hover:text-red-300 transition-colors">Investigar alguém</div>
-            <div class="text-zinc-500 text-xs mt-1 leading-tight">Checar sanções e irregularidades</div>
+            <div class="font-bold text-white text-sm group-hover:text-red-300 transition-colors">Investigação & IA</div>
+            <div class="text-zinc-500 text-xs mt-1 leading-tight">Sanções CEIS, CNEP e PEPs</div>
           </div>
         </button>
 
         <button onclick="window.customSwitchTab('orcamento')"
-                class="group glass-panel rounded-2xl p-4 text-left border border-white/5 hover:border-green-500/40 hover:bg-green-500/5 transition-all duration-200 flex flex-col gap-3">
-          <span class="text-3xl leading-none">💰</span>
+                class="group glass-card rounded-2xl p-4 sm:p-5 text-left border border-white/5 hover:border-emerald-500/40 hover:bg-emerald-950/20 transition-all duration-200 flex flex-col justify-between gap-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+            <?= getSaaSIcon('coins', 'w-5 h-5') ?>
+          </div>
           <div>
-            <div class="font-bold text-white text-sm group-hover:text-green-300 transition-colors">Ver Gastos Públicos</div>
-            <div class="text-zinc-500 text-xs mt-1 leading-tight">Orçamento e contratos federais</div>
+            <div class="font-bold text-white text-sm group-hover:text-emerald-300 transition-colors">Cofres Públicos</div>
+            <div class="text-zinc-500 text-xs mt-1 leading-tight">Orçamento, diárias e contratos</div>
           </div>
         </button>
 
-        <button onclick="window.customSwitchTab('municipio')"
-                class="group glass-panel rounded-2xl p-4 text-left border border-white/5 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all duration-200 flex flex-col gap-3">
-          <span class="text-3xl leading-none">🏘️</span>
+        <button onclick="window.customSwitchTab('mapa')"
+                class="group glass-card rounded-2xl p-4 sm:p-5 text-left border border-white/5 hover:border-amber-500/40 hover:bg-amber-950/20 transition-all duration-200 flex flex-col justify-between gap-4">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+            <?= getSaaSIcon('map', 'w-5 h-5') ?>
+          </div>
           <div>
-            <div class="font-bold text-white text-sm group-hover:text-amber-300 transition-colors">Minha Cidade</div>
-            <div class="text-zinc-500 text-xs mt-1 leading-tight">Repasses e representantes locais</div>
+            <div class="font-bold text-white text-sm group-hover:text-amber-300 transition-colors">Mapa de Gastos</div>
+            <div class="text-zinc-500 text-xs mt-1 leading-tight">Distribuição territorial dos recursos</div>
           </div>
         </button>
 
@@ -221,11 +346,11 @@
         </div>
         <!-- CTAs -->
         <div class="flex flex-col gap-2 flex-shrink-0 w-full sm:w-auto">
-          <a href="/cadastrar"
+          <a href="<?php echo BASE_PATH; ?>/cadastrar"
             class="inline-flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-violet-900/30 whitespace-nowrap">
             Entrar na Rede
           </a>
-          <a href="/entrar"
+          <a href="<?php echo BASE_PATH; ?>/entrar"
             class="inline-flex items-center justify-center gap-2 bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-600/50 text-zinc-300 font-semibold px-5 py-2 rounded-xl text-xs transition whitespace-nowrap">
             Já tenho conta →
           </a>
@@ -241,7 +366,7 @@
         <p class="text-zinc-400 text-sm flex-1">
           Debata essas pautas com outros usuários na sua <strong class="text-white">linha do tempo</strong>.
         </p>
-        <a href="'/feed'"
+        <a href="<?php echo BASE_PATH; ?>/feed"
           class="flex-shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition whitespace-nowrap">
           Ir para o Feed →
         </a>
@@ -286,7 +411,7 @@
         <button onclick="window.customSwitchTab('<?= $id ?>');<?= $extra ?>" 
                 class="glass-panel p-4 sm:p-5 rounded-2xl transition-all duration-300 text-left h-32 sm:h-36 flex flex-col justify-between group <?= $colorClass ?> relative overflow-hidden border border-white/5">
             <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 <?= $iconBg ?> border transition-colors duration-300">
-                <?= $icon ?>
+                <?= getSaaSIcon($icon, 'w-6 h-6') ?>
             </div>
             <div class="flex items-center justify-between w-full">
                 <span class="font-bold text-white text-xs sm:text-sm truncate transition-colors duration-300"><?= $label ?></span>
@@ -296,23 +421,29 @@
         <?php endforeach; } ?>
         
         <!-- Manual special buttons -->
-        <a href="/transparencia/wiki" class="glass-panel p-4 sm:p-5 rounded-2xl transition-all duration-300 text-left h-32 sm:h-36 flex flex-col justify-between group hover:border-amber-500/50 hover:bg-amber-500/5 border border-white/5 relative overflow-hidden">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 bg-amber-500/10 text-amber-400 border border-amber-500/20 transition-colors duration-300">📖</div>
+        <a href="wiki.php" class="glass-panel p-4 sm:p-5 rounded-2xl transition-all duration-300 text-left h-32 sm:h-36 flex flex-col justify-between group hover:border-amber-500/50 hover:bg-amber-500/5 border border-white/5 relative overflow-hidden">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 bg-amber-500/10 text-amber-400 border border-amber-500/20 transition-colors duration-300">
+                <?= getSaaSIcon('book', 'w-6 h-6') ?>
+            </div>
             <div class="flex items-center justify-between w-full">
                 <span class="font-bold text-white text-xs sm:text-sm truncate group-hover:text-amber-400 transition-colors duration-300">Wiki Política</span>
                 <svg class="w-3 h-3 sm:w-4 sm:h-4 text-zinc-600 group-hover:text-amber-400 transition-all duration-300 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </div>
         </a>
-        <a href="/transparencia/jogo" class="glass-panel p-4 sm:p-5 rounded-2xl transition-all duration-300 text-left h-32 sm:h-36 flex flex-col justify-between group hover:border-fuchsia-500/50 hover:bg-fuchsia-500/5 border border-white/5 relative overflow-hidden">
+        <a href="game.php" class="glass-panel p-4 sm:p-5 rounded-2xl transition-all duration-300 text-left h-32 sm:h-36 flex flex-col justify-between group hover:border-fuchsia-500/50 hover:bg-fuchsia-500/5 border border-white/5 relative overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-br from-violet-600/5 to-fuchsia-600/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 transition-colors duration-300 group-hover:animate-bounce">🎮</div>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 transition-colors duration-300 group-hover:scale-110">
+                <?= getSaaSIcon('game', 'w-6 h-6') ?>
+            </div>
             <div class="flex items-center justify-between w-full relative z-10">
                 <span class="font-bold text-white text-xs sm:text-sm truncate group-hover:text-fuchsia-400 transition-colors duration-300">DepuMon GO</span>
                 <svg class="w-3 h-3 sm:w-4 sm:h-4 text-zinc-600 group-hover:text-fuchsia-400 transition-all duration-300 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </div>
         </a>
-        <a href="/transparencia/ranking" class="glass-panel p-4 sm:p-5 rounded-2xl transition-all duration-300 text-left h-32 sm:h-36 flex flex-col justify-between group hover:border-yellow-500/50 hover:bg-yellow-500/5 border border-white/5 relative overflow-hidden">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 transition-colors duration-300">🏆</div>
+        <a href="ranking.php" class="glass-panel p-4 sm:p-5 rounded-2xl transition-all duration-300 text-left h-32 sm:h-36 flex flex-col justify-between group hover:border-yellow-500/50 hover:bg-yellow-500/5 border border-white/5 relative overflow-hidden">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 transition-colors duration-300">
+                <?= getSaaSIcon('award', 'w-6 h-6') ?>
+            </div>
             <div class="flex items-center justify-between w-full">
                 <span class="font-bold text-white text-xs sm:text-sm truncate group-hover:text-yellow-400 transition-colors duration-300">Ranking</span>
                 <svg class="w-3 h-3 sm:w-4 sm:h-4 text-zinc-600 group-hover:text-yellow-400 transition-all duration-300 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>

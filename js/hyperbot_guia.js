@@ -415,29 +415,6 @@
       exemplo_chat: ["rede de conexões Fulano", "mapa conexões deputado", "grafo político"],
       relacionadas: ["politicos", "radar", "licitacoes"],
     },
-
-    municipio: {
-      id: "municipio",
-      nome: "Minha Cidade",
-      icone: "🏘️",
-      cor: "#34d399",
-      descricao: "Hackeie as contas da sua prefeitura — exponha gastos, contratos secretos e servidores fantasmas.",
-      oque_fazer: [
-        "Ver orçamento executado pela prefeitura por secretaria",
-        "Consultar servidores municipais e salários",
-        "Verificar contratos e licitações da prefeitura",
-        "Comparar gastos previstos vs. realizados",
-        "Fiscalizar fornecedores e empresas contratadas",
-      ],
-      dicas: [
-        "Funciona com prefeituras que usam o sistema Fiorilli/MS Gestão Pública",
-        "Diga 'sou de [cidade]' no chat para salvar sua cidade e acesso rápido",
-        "Use junto ao Radar para verificar empresas que recebem da prefeitura",
-        "Secretaria com execução abaixo do previsto pode indicar obras paradas",
-      ],
-      exemplo_chat: ["minha cidade", "prefeitura Campinas", "gastos prefeitura SP"],
-      relacionadas: ["orcamento", "radar", "servidores"],
-    },
   };
 
   // ════════════════════════════════════════════════════════════════════════
@@ -548,11 +525,11 @@
           acao: () => { window.HyperBotAgent.ctx.aguardandoResposta = "config_cidade"; window.HyperBotChat?.pushBotMsg?.("info","📍 Qual sua cidade?","Ex: Sou de Belo Horizonte, Recife, Porto Alegre..."); },
         },
         {
-          titulo: "2. Ver execução orçamentária",
-          html: `Diga <em>"dados do meu município"</em> ou abra a aba <strong>Minha Cidade</strong>.<br>
-                 Veja quanto cada secretaria gastou vs. o que foi orçado.`,
-          acao_label: "Abrir Minha Cidade",
-          acao: () => window.customSwitchTab?.("municipio"),
+          titulo: "2. Ver repasses e despesas",
+          html: `Abra o <strong>Mapa de Gastos</strong> para visualizar os repasses e transferências federais.<br>
+                 Acompanhe a distribuição de recursos por região e estado.`,
+          acao_label: "Abrir Mapa de Gastos",
+          acao: () => window.customSwitchTab?.("mapa"),
         },
         {
           titulo: "3. Verificar fornecedores",

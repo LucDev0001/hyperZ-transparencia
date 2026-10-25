@@ -343,17 +343,24 @@ async function loadDeputies() {
   const name = document.getElementById("nameSearch").value;
   const grid = document.getElementById("deputiesGrid");
 
-  grid.innerHTML =
-    '<div class="col-span-full text-center py-10 text-zinc-500"><span class="animate-pulse">Carregando dados de Brasília...</span></div>';
+  grid.innerHTML = (typeof window.createSkeleton === 'function') 
+    ? window.createSkeleton('cards', 8) 
+    : '<div class="col-span-full text-center py-10 text-zinc-500"><span class="animate-pulse">Carregando dados de Brasília...</span></div>';
 
   try {
-    let query = `deputados?ordem=ASC&ordenarPor=nome&itens=100`;
-    if (uf) query += `&siglaUf=${uf}`;
-    if (party) query += `&siglaPartido=${party}`;
-    if (name) query += `&nome=${name}`;
+    let query = `deputados?ordem=ASC&ordenarPor=nome&itens=1000`;
 
     const json = await api.camara(query);
-    const deputies = json.dados || [];
+    let deputies = json.dados || [];
+
+    if (uf) deputies = deputies.filter(d => d.siglaUf === uf);
+    if (party) deputies = deputies.filter(d => d.siglaPartido === party);
+    if (name) {
+      const searchTerm = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      deputies = deputies.filter(d => 
+        d.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes(searchTerm)
+      );
+    }
 
     if (deputies.length === 0) {
       grid.innerHTML =
@@ -364,14 +371,29 @@ async function loadDeputies() {
     grid.innerHTML = deputies
       .map(
         (d) => `
-            <div onclick="openDeputyDetails(${d.id})" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center gap-4 hover:border-violet-500 transition group cursor-pointer">
-                <div class="w-16 h-16 rounded-full overflow-hidden bg-zinc-800 border-2 border-zinc-700 flex-shrink-0">
-                    <img src="${d.urlFoto}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${d.nome}">
+            <div onclick="openDeputyDetails(${d.id})" class="glass-card rounded-2xl p-4 flex items-center gap-4 cursor-pointer group relative overflow-hidden">
+                <div class="relative flex-shrink-0">
+                    <div class="w-14 h-14 rounded-2xl overflow-hidden bg-zinc-800 border border-white/10 shadow-md">
+                        <img src="${d.urlFoto}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="${d.nome}" loading="lazy">
+                    </div>
+                    <span class="absolute -bottom-1 -right-1 text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-violet-950 text-violet-300 border border-violet-500/40 shadow-xs">${d.siglaUf}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="font-bold text-white truncate text-base">${d.nome}</h3>
-                    <p class="text-sm text-violet-400 font-bold">${d.siglaPartido} - ${d.siglaUf}</p>
-                    <span class="text-xs text-zinc-500 truncate block mt-1">${d.email || ""}</span>
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <span class="text-[10px] font-mono font-bold text-violet-400 bg-violet-500/10 px-1.5 py-0.2 rounded border border-violet-500/20">${d.siglaPartido}</span>
+                    </div>
+                    <h3 class="font-bold text-white truncate text-sm group-hover:text-violet-300 transition-colors">${d.nome}</h3>
+                    <span class="text-[11px] text-zinc-500 truncate block mt-0.5">${d.email || "Gabinete em Brasília"}</span>
+                </div>
+                <div class="flex items-center gap-1 flex-shrink-0">
+                    <button onclick="event.stopPropagation(); window.inspectDeputy(${d.id})"
+                            title="Inspetor Rápido (Lateral)"
+                            class="p-2 rounded-xl text-zinc-500 hover:text-violet-300 hover:bg-violet-500/15 border border-transparent hover:border-violet-500/20 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </button>
+                    <div class="text-zinc-600 group-hover:text-violet-400 group-hover:translate-x-1 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </div>
                 </div>
             </div>
         `,
@@ -551,7 +573,12 @@ async function switchSenatorTab(tab, codigo) {
 
 async function loadPoliticalNews() {
   const grid = document.getElementById("newsGrid");
-  if (grid.children.length > 1) return;
+  if (!grid) return;
+  if (grid.children.length > 2) return;
+
+  if (typeof window.createSkeleton === 'function') {
+    grid.innerHTML = window.createSkeleton('cards', 6);
+  }
 
   try {
     const news = await api.news();
@@ -559,24 +586,19 @@ async function loadPoliticalNews() {
     grid.innerHTML = news
       .map(
         (n) => `
-            <a href="${
-              n.link
-            }" target="_blank" class="block bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-violet-500 transition group">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-bold text-violet-400 uppercase tracking-wider">${
-                      n.source
-                    }</span>
-                    <span class="text-xs text-zinc-500">${window.formatDate(n.date * 1000)}</span>
+            <a href="${n.link}" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-5 block group relative overflow-hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[10px] font-mono font-bold text-violet-300 bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">${n.source}</span>
+                    <span class="text-xs text-zinc-500 font-mono">${window.formatDate(n.date * 1000)}</span>
                 </div>
-                <h3 class="font-bold text-white text-lg mb-2 group-hover:text-violet-300 transition">${
-                  n.title
-                }</h3>
-                <p class="text-sm text-zinc-400 line-clamp-3">${
-                  n.description
-                }</p>
-                <div class="mt-3 text-xs text-zinc-500 flex items-center gap-1">
-                    Ler matéria completa 
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                <h3 class="font-bold text-white text-base md:text-lg mb-2 group-hover:text-violet-300 transition leading-snug">${n.title}</h3>
+                <p class="text-sm text-zinc-400 line-clamp-3 leading-relaxed">${n.description}</p>
+                <div class="mt-4 pt-3 border-t border-white/5 text-xs text-zinc-500 flex items-center justify-between">
+                    <span class="text-violet-400 font-semibold group-hover:underline flex items-center gap-1.5">
+                      Ler matéria completa 
+                      <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </span>
+                    <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </div>
             </a>
         `,
@@ -638,245 +660,169 @@ async function loadFederalExpenses(force = false) {
   const container = document.getElementById("federal-expenses-list");
   const chartContainer = document.getElementById("gestaoChartContainer");
   const statusDiv = document.getElementById("federal-expenses-status");
+  const kpiContainer = document.getElementById("gestao-orcamento-kpis");
 
-  if (
-    !force &&
-    container.children.length > 0 &&
-    !container.querySelector(".animate-pulse")
-  ) {
+  if (!force && container && container.children.length > 0 && !container.querySelector(".animate-pulse")) {
     return;
   }
 
-  container.innerHTML = "";
-  if (statusDiv) statusDiv.innerHTML = `<div class="text-center text-zinc-500 py-4"><span class="animate-pulse">Preparando consulta ao Portal da Transparência...</span></div>`;
+  if (container) container.innerHTML = "";
+  if (statusDiv) statusDiv.innerHTML = `<div class="text-center text-zinc-500 py-4"><span class="animate-pulse">Consultando orçamento no Portal da Transparência...</span></div>`;
   if (chartContainer) chartContainer.classList.add("hidden");
+  if (kpiContainer) kpiContainer.classList.add("hidden");
 
   try {
-    let allData = [];
-    let isPaymentList = false;
+    const orgaoSuperior = document.getElementById("gestao-orgao")?.value || "36000";
+    const ano = document.getElementById("gestao-ano")?.value || "2024";
 
-    if (currentFilterMode === "ano") {
-        const ano = document.getElementById("input-ano")?.value || new Date().getFullYear() - 1;
-        const endpoint = `despesas/por-funcional-programatica?ano=${ano}&pagina=1`;
-        if (statusDiv) statusDiv.innerHTML = `<div class="text-center text-zinc-500 py-4"><span class="animate-pulse">Consultando orçamento de ${ano}...</span></div>`;
-        const data = await api.portal(endpoint);
-        allData = Array.isArray(data) ? data : [];
-    } else {
-        isPaymentList = true;
-        const datesToFetch = [];
-        let dateLabel = "";
+    if (statusDiv) statusDiv.innerHTML = `<div class="text-center text-zinc-500 py-4 animate-pulse">Extraindo execução orçamentária do SIAFI (${ano})...</div>`;
 
-        if (currentFilterMode === "dia") {
-            const dia = document.getElementById("input-dia")?.value;
-            if (!dia) throw new Error("Selecione um dia");
-            datesToFetch.push(dia.split('-').reverse().join('/'));
-            dateLabel = datesToFetch[0];
-        } else if (currentFilterMode === "mes") {
-            const mes = document.getElementById("input-mes")?.value;
-            if (!mes) throw new Error("Selecione um mês");
-            const [y, m] = mes.split('-');
-            const lastDay = new Date(y, m, 0).getDate();
-            dateLabel = `${m}/${y}`;
-            for (let i = 1; i <= lastDay; i++) {
-                datesToFetch.push(`${String(i).padStart(2,'0')}/${m}/${y}`);
-            }
-        } else if (currentFilterMode === "semana") {
-             const semana = document.getElementById("input-semana")?.value;
-             if (!semana) throw new Error("Selecione uma semana");
-             const [y, w] = semana.split('-W');
-             const d = new Date(y, 0, 1 + (w - 1) * 7);
-             d.setDate(d.getDate() + (1 - (d.getDay() || 7)));
-             dateLabel = `Semana ${w} de ${y}`;
-             for(let i=0; i<7; i++){
-                const currentDay = new Date(d);
-                currentDay.setDate(d.getDate() + i);
-                datesToFetch.push(`${String(currentDay.getDate()).padStart(2, '0')}/${String(currentDay.getMonth() + 1).padStart(2, '0')}/${currentDay.getFullYear()}`);
-             }
-        }
-        
-        const promises = datesToFetch.map((date, index) => {
-            if (statusDiv) {
-                const percentage = Math.round(((index + 1) / datesToFetch.length) * 100);
-                statusDiv.innerHTML = `<div class="text-center text-zinc-500 py-4 animate-pulse">Consultando ${dateLabel}: dia ${index + 1} de ${datesToFetch.length} (${percentage}%)...</div>`;
-            }
-            const endpoint = `despesas/documentos?dataEmissao=${date}&fase=3&pagina=1`;
-            return api.portal(endpoint);
-        });
+    const endpoint = `despesas/por-orgao?ano=${ano}&orgaoSuperior=${orgaoSuperior}&pagina=1`;
+    const data = await api.portal(endpoint);
 
-        const results = await Promise.allSettled(promises);
-        
-        const errors = [];
-        results.forEach(res => {
-            if (res.status === 'fulfilled') {
-                const data = res.value;
-                if (Array.isArray(data)) {
-                    allData.push(...data);
-                } else if (data && (data.erro || data.message)) {
-                    errors.push(data.erro || data.message);
-                }
-            } else {
-                errors.push(res.reason.message || 'Erro de rede');
-            }
-        });
-        
-        if (errors.length > 0) {
-            container.innerHTML = `<div class="text-center text-yellow-400 bg-yellow-950/30 border border-yellow-800 p-3 rounded-lg text-sm mb-4">⚠️ Algumas consultas falharam. Os dados podem estar incompletos. <br><span class="text-xs text-yellow-600">Erro: ${errors[0]}</span></div>`;
-        }
-    }
-    
     if (statusDiv) statusDiv.innerHTML = "";
 
+    if (!data || data.erro || data.message) {
+      const msg = data?.erro || data?.message || "Erro desconhecido retornado pela API.";
+      container.innerHTML = `<div class="text-center text-red-400 py-10 px-4 bg-red-950/20 border border-red-500/20 rounded-xl">⚠️ Falha ao consultar orçamento:<br><span class="text-zinc-400 text-xs mt-1 block">${msg}</span></div>`;
+      return;
+    }
+
+    const allData = Array.isArray(data) ? data : [];
+
     if (allData.length === 0) {
-      container.innerHTML += '<div class="text-center text-zinc-500 py-10">Nenhum dado encontrado para o período.</div>';
+      container.innerHTML = '<div class="text-center text-zinc-500 py-10">Nenhum registro orçamentário encontrado para este ministério no ano selecionado.</div>';
       if (gestaoChartInstance) gestaoChartInstance.destroy();
       return;
     }
-    
-    renderGestaoChart(allData, currentFilterMode);
 
-    if (isPaymentList) {
-      allData.sort((a,b) => window.parsePtBrFloat(b.valor) - window.parsePtBrFloat(a.valor));
-      container.innerHTML += allData
-        .map(
-          (item) => `
-        <div class="bg-zinc-800 p-4 rounded-xl flex justify-between items-center border border-zinc-700 hover:border-violet-500 transition">
-            <div class="flex-1 min-w-0 pr-4">
-                <div class="font-bold text-white text-sm truncate">${item.favorecido?.nome || "Sem Favorecido"}</div>
-                <div class="text-xs text-zinc-500 truncate">${item.orgaoPagador?.nome || "Órgão Desconhecido"}</div>
-                <div class="text-[10px] text-zinc-600">${item.dataEmissao || ""} - ${item.documentoResumido?.descricao || 'Pagamento'}</div>
-            </div>
-            <div class="text-right whitespace-nowrap">
-                <div class="text-green-400 font-bold text-sm">${window.formatCurrency(window.parsePtBrFloat(item.valor || "0"))}</div>
-            </div>
-        </div>
-      `,
-        )
-        .join("");
-    } else {
-      container.innerHTML += allData
-        .map((item) => {
-          const nome = item.funcao?.descricao || item.nomeFuncao || item.funcao || "—";
-          const codigoFuncao = item.funcao?.codigo || item.codigoFuncao;
-          const vPago = window.parsePtBrFloat(item.pago || "0");
-          const vEmpenhado = window.parsePtBrFloat(item.empenhado || "0");
-          const vLiquidado = window.parsePtBrFloat(item.liquidado || "0");
+    // Calcular totais e atualizar KPIs
+    let totalEmp = 0, totalLiq = 0, totalPago = 0;
+    allData.forEach((item) => {
+      totalEmp += window.parsePtBrFloat(item.empenhado || "0");
+      totalLiq += window.parsePtBrFloat(item.liquidado || "0");
+      totalPago += window.parsePtBrFloat(item.pago || "0");
+    });
 
-          return `
-        <div class="bg-zinc-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center border border-zinc-700 hover:border-violet-500 transition gap-4">
-            <div class="flex-1 min-w-0">
-                <div class="font-bold text-white text-sm truncate" title="${nome}">${nome}</div>
-                <div class="text-xs text-zinc-500">Função ${codigoFuncao}</div>
-            </div>
-            <div class="flex gap-6 text-right">
-                <div class="hidden md:block">
-                    <div class="text-[10px] text-zinc-500 uppercase">Empenhado</div>
-                    <div class="text-zinc-300 font-bold text-xs">${window.formatCurrency(vEmpenhado)}</div>
-                </div>
-                <div class="hidden md:block">
-                    <div class="text-[10px] text-zinc-500 uppercase">Liquidado</div>
-                    <div class="text-blue-400 font-bold text-xs">${window.formatCurrency(vLiquidado)}</div>
-                </div>
-                <div>
-                    <div class="text-[10px] text-zinc-500 uppercase">Pago</div>
-                    <div class="text-green-400 font-bold text-sm">${window.formatCurrency(vPago)}</div>
-                </div>
-            </div>
-        </div>
-      `;
-        })
-        .join("");
+    const kpiEmp = document.getElementById("kpi-empenhado");
+    const kpiLiq = document.getElementById("kpi-liquidado");
+    const kpiPago = document.getElementById("kpi-pago");
+    const kpiTaxa = document.getElementById("kpi-taxa");
+
+    if (kpiEmp) kpiEmp.textContent = window.formatCurrency(totalEmp);
+    if (kpiLiq) kpiLiq.textContent = window.formatCurrency(totalLiq);
+    if (kpiPago) kpiPago.textContent = window.formatCurrency(totalPago);
+    if (kpiTaxa) {
+      const taxa = totalEmp > 0 ? Math.min(100, Math.round((totalPago / totalEmp) * 100)) : 0;
+      kpiTaxa.textContent = `${taxa}%`;
     }
+    if (kpiContainer) kpiContainer.classList.remove("hidden");
+
+    // Ordenar do maior para o menor valor pago
+    allData.sort((a, b) => window.parsePtBrFloat(b.pago || "0") - window.parsePtBrFloat(a.pago || "0"));
+
+    renderGestaoChart(allData, "ano");
+
+    container.innerHTML = allData
+      .map((item) => {
+        const nome = item.orgao || item.descricaoOrgao || "Órgão Vinculado";
+        const cod = item.codigoOrgao || item.codigo || "";
+        const orgaoSup = item.orgaoSuperior || "";
+        const vPago = window.parsePtBrFloat(item.pago || "0");
+        const vEmpenhado = window.parsePtBrFloat(item.empenhado || "0");
+        const vLiquidado = window.parsePtBrFloat(item.liquidado || "0");
+        const taxaExec = vEmpenhado > 0 ? Math.min(100, Math.round((vPago / vEmpenhado) * 100)) : 0;
+
+        return `
+          <div class="bg-zinc-900/60 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center border border-white/5 hover:border-violet-500/50 transition gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span class="text-[10px] font-mono font-bold bg-violet-600/20 text-violet-400 px-2 py-0.5 rounded-lg border border-violet-500/20">SIAFI ${cod}</span>
+                <span class="text-[10px] font-bold text-zinc-500 truncate">${orgaoSup}</span>
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-full ${taxaExec >= 80 ? 'bg-green-500/20 text-green-400 border border-green-500/30' : taxaExec >= 50 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-zinc-800 text-zinc-400'}">${taxaExec}% Executado</span>
+              </div>
+              <h4 class="font-bold text-white text-sm md:text-base leading-snug truncate" title="${nome}">${nome}</h4>
+              <div class="w-full bg-zinc-800 h-1.5 rounded-full mt-2.5 overflow-hidden">
+                <div class="bg-gradient-to-r from-violet-600 to-green-400 h-full rounded-full transition-all duration-700" style="width: ${taxaExec}%"></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 md:gap-6 text-right flex-shrink-0 self-end md:self-center">
+              <div>
+                <div class="text-[9px] text-zinc-500 uppercase font-black">Empenhado</div>
+                <div class="text-zinc-300 font-bold text-xs md:text-sm font-mono">${window.formatCurrency(vEmpenhado)}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-zinc-500 uppercase font-black">Liquidado</div>
+                <div class="text-blue-400 font-bold text-xs md:text-sm font-mono">${window.formatCurrency(vLiquidado)}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-zinc-500 uppercase font-black">Pago</div>
+                <div class="text-green-400 font-black text-sm md:text-base font-mono">${window.formatCurrency(vPago)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
   } catch (e) {
     console.error(e);
-    if(statusDiv) statusDiv.innerHTML = '';
-    container.innerHTML = `<div class="text-center text-red-500 py-4">Erro Crítico: ${e.message}. Verifique o console.</div>`;
+    if (statusDiv) statusDiv.innerHTML = "";
+    container.innerHTML = `<div class="text-center text-red-500 py-6 bg-red-950/20 border border-red-500/20 rounded-xl">Erro ao carregar orçamento: ${e.message}</div>`;
   }
 }
 
 function renderGestaoChart(data, mode) {
-  const ctx = document.getElementById("gestaoChart").getContext("2d");
+  const ctx = document.getElementById("gestaoChart")?.getContext("2d");
   const container = document.getElementById("gestaoChartContainer");
   const title = document.getElementById("gestaoChartTitle");
 
+  if (!ctx || !container) return;
   if (gestaoChartInstance) gestaoChartInstance.destroy();
   container.classList.remove("hidden");
 
-  let labels = [];
-  let values = [];
-  let label = "Valor (R$)";
-  let type = "bar";
+  const byOrgao = {};
+  data.forEach((d) => {
+    const nome = d.orgao || d.funcao?.descricao || d.nomeFuncao || d.descricaoOrgao || d.nome || "—";
+    if (!byOrgao[nome]) byOrgao[nome] = 0;
+    byOrgao[nome] += window.parsePtBrFloat(d.pago || d.valorPago || d.valor || "0");
+  });
 
-  if (mode === "ano") {
-    // Agrupa por funcao (por-funcional-programatica retorna uma linha por acao)
-    // funcao pode ser string ou objeto {codigo, descricao} dependendo da versão da API
-    const byFuncao = {};
-    data.forEach((d) => {
-      const nome = d.funcao?.descricao || d.nomeFuncao || d.funcao || d.descricaoOrgao || d.orgao || d.nome || "—";
-      if (!byFuncao[nome]) byFuncao[nome] = 0;
-      byFuncao[nome] += window.parsePtBrFloat(
-        d.pago || d.valorPago || d.valor || "0",
-      );
-    });
-    const sorted = Object.entries(byFuncao)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-    labels = sorted.map(([nome]) =>
-      nome.length > 22 ? nome.substring(0, 22) + "…" : nome,
-    );
-    values = sorted.map(([, val]) => val);
-    label = "Orçamento Executado — Top 10 Funções";
-    title.textContent = "🏆 Maiores Orçamentos por Área de Governo";
-  } else {
-    // Evolução Diária (Linha)
-    const daily = {};
-    data.forEach((d) => {
-      const date = d.dataEmissao || d.dataPagamento || ""; // DD/MM/YYYY
-      if (!date) return;
-      if (!daily[date]) daily[date] = 0;
-      daily[date] += window.parsePtBrFloat(d.valor || d.valorDocumento || d.valorPago || "0");
-    });
+  const sorted = Object.entries(byOrgao)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
 
-    // Ordenar por data
-    labels = Object.keys(daily).sort((a, b) => {
-      const [da, ma, ya] = a.split("/");
-      const [db, mb, yb] = b.split("/");
-      return new Date(ya, ma - 1, da) - new Date(yb, mb - 1, db);
-    });
-    values = labels.map((k) => daily[k]);
-    type = "line";
-    title.textContent = "📅 Evolução de Pagamentos no Período";
-  }
+  const labels = sorted.map(([nome]) => nome.length > 28 ? nome.substring(0, 28) + "…" : nome);
+  const values = sorted.map(([, val]) => val);
+
+  if (title) title.textContent = "🏆 Top 10 Maiores Orçamentos Executados no Ministério";
 
   gestaoChartInstance = new Chart(ctx, {
-    type: type,
+    type: "bar",
     data: {
       labels: labels,
       datasets: [
         {
-          label: label,
+          label: "Valor Pago (R$)",
           data: values,
-          backgroundColor:
-            type === "bar" ? "#8b5cf6" : "rgba(139, 92, 246, 0.1)",
-          borderColor: "#8b5cf6",
-          borderWidth: 2,
-          fill: type === "line",
-          tension: 0.4,
-          pointRadius: type === "line" ? 3 : 0,
+          backgroundColor: "#8b5cf6",
+          borderColor: "#7c3aed",
+          borderWidth: 1,
+          borderRadius: 8,
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      indexAxis: type === "bar" ? "y" : "x",
+      indexAxis: "y",
       scales: {
         x: {
-          grid: { color: "#27272a" },
+          grid: { color: "rgba(255, 255, 255, 0.05)" },
           ticks: { color: "#a1a1aa", font: { size: 10 } },
         },
         y: {
-          grid: { color: "#27272a" },
-          ticks: { color: "#a1a1aa", font: { size: 10 } },
+          grid: { display: false },
+          ticks: { color: "#e4e4e7", font: { size: 11, weight: "bold" } },
         },
       },
       plugins: {
@@ -884,7 +830,7 @@ function renderGestaoChart(data, mode) {
         tooltip: {
           callbacks: {
             label: function (context) {
-              return window.formatCurrency(context.raw);
+              return " " + window.formatCurrency(context.raw);
             },
           },
         },
@@ -892,12 +838,9 @@ function renderGestaoChart(data, mode) {
     },
   });
 }
-
 function toggleGestaoMode(mode) {
-  const inactive =
-    "px-4 py-1.5 text-sm font-bold rounded-md text-zinc-400 hover:text-white transition";
-  const active =
-    "px-4 py-1.5 text-sm font-bold rounded-md bg-violet-600 text-white shadow transition";
+  const inactive = "px-4 py-2 text-xs font-black rounded-lg text-zinc-400 hover:text-white transition";
+  const active = "px-4 py-2 text-xs font-black rounded-lg bg-violet-600 text-white shadow-lg transition";
   const modes = ["orcamento", "cartoes", "contratos"];
   modes.forEach((m) => {
     const btn = document.getElementById(`btn-gestao-${m}`);
@@ -905,11 +848,32 @@ function toggleGestaoMode(mode) {
     if (btn) btn.className = m === mode ? active : inactive;
     if (view) view.classList.toggle("hidden", m !== mode);
   });
+
+  const titles = {
+    orcamento: "Execução Orçamentária por Ministério",
+    cartoes: "Gastos com Cartões Corporativos (CPGF)",
+    contratos: "Contratos Federais Oficiais (COMPRASNET)"
+  };
+  const titleEl = document.getElementById("gestao-section-title");
+  if (titleEl && titles[mode]) titleEl.textContent = titles[mode];
+
+  if (mode === "cartoes") {
+    const container = document.getElementById("cards-results-list");
+    if (container && container.textContent.includes("Clique em Consultar")) {
+      loadPaymentCards(1);
+    }
+  } else if (mode === "contratos") {
+    const container = document.getElementById("contratos-results");
+    if (container && container.textContent.includes("Selecione o órgão")) {
+      searchContratos();
+    }
+  }
 }
 
 let contratosData = [];
 
 async function searchContratos() {
+  const orgao = document.getElementById("contratos-orgao")?.value || "36000";
   const termo = document.getElementById("contratos-search")?.value?.trim() || "";
   const cnpj = document.getElementById("contratos-cnpj")?.value?.replace(/[^\d]/g, "") || "";
   const dataInicial = document.getElementById("contratos-data-ini")?.value || "";
@@ -917,52 +881,36 @@ async function searchContratos() {
   const container = document.getElementById("contratos-results");
   const statsBar = document.getElementById("contratos-stats");
 
-  if (!termo && !cnpj && !dataInicial && !dataFinal) {
-    container.innerHTML = '<div class="text-center text-amber-400 py-10 px-4">⚠️ Informe ao menos um filtro para a busca.</div>';
-    return;
-  }
-
-  container.innerHTML = '<div class="text-center text-zinc-500 py-10 animate-pulse">Consultando contratos federais...</div>';
+  if (container) container.innerHTML = '<div class="text-center text-zinc-500 py-10 animate-pulse">Consultando contratos federais oficiais...</div>';
   if (statsBar) statsBar.classList.add("hidden");
 
   try {
     let endpoint = "";
-    
-    // Prioridade para busca por CNPJ, que usa um endpoint diferente.
     if (cnpj) {
-        endpoint = `contratos/cpf-cnpj?cpfCnpjFornecedor=${cnpj}&pagina=1`;
-        if (termo || dataInicial || dataFinal) {
-            console.warn("Busca por CNPJ priorizada. Outros filtros (termo, datas) serão ignorados pois não são suportados por este endpoint específico.");
-        }
+      endpoint = `contratos/cpf-cnpj?cpfCnpjFornecedor=${cnpj}&pagina=1`;
     } else {
-        // Endpoint geral 'contratos' exige codigoOrgao ou um período de data para buscas com termo.
-        if (termo && !dataInicial && !dataFinal) {
-             container.innerHTML = '<div class="text-center text-amber-400 py-10 px-4">⚠️ Ao buscar por um termo, por favor, especifique também um período (data inicial e final).</div>';
-             return;
-        }
-        endpoint = "contratos?pagina=1";
-        if (dataInicial) {
-            const [y, m, d] = dataInicial.split("-");
-            endpoint += `&dataInicial=${d}/${m}/${y}`;
-        }
-        if (dataFinal) {
-            const [y, m, d] = dataFinal.split("-");
-            endpoint += `&dataFinal=${d}/${m}/${y}`;
-        }
-        if (termo) endpoint += `&termo=${encodeURIComponent(termo)}`;
+      endpoint = `contratos?codigoOrgao=${orgao}&pagina=1`;
+      if (dataInicial) {
+        const [y, m, d] = dataInicial.split("-");
+        endpoint += `&dataInicial=${d}/${m}/${y}`;
+      }
+      if (dataFinal) {
+        const [y, m, d] = dataFinal.split("-");
+        endpoint += `&dataFinal=${d}/${m}/${y}`;
+      }
+      if (termo) endpoint += `&termo=${encodeURIComponent(termo)}`;
     }
 
     const data = await api.portal(endpoint);
 
-    // Verificar erros da API antes de tentar iterar
-    if (data && (data.erro || data.message)) {
-      container.innerHTML = `<div class="text-center text-red-400 py-10 px-4">⚠️ Erro retornado pelo Portal da Transparência:<br><span class="text-zinc-400 text-xs mt-1 block">${data.erro || data.message}</span></div>`;
+    if (!data || data.erro || data.message) {
+      const msg = data?.erro || data?.message || "Erro retornado pela API.";
+      container.innerHTML = `<div class="text-center text-red-400 py-10 px-4 bg-red-950/20 border border-red-500/20 rounded-xl">⚠️ Falha ao consultar contratos:<br><span class="text-zinc-400 text-xs mt-1 block">${msg}</span></div>`;
       return;
     }
 
     if (!Array.isArray(data) || data.length === 0) {
-      container.innerHTML =
-        '<div class="text-center text-zinc-500 py-10">Nenhum contrato encontrado para os filtros informados.</div>';
+      container.innerHTML = '<div class="text-center text-zinc-500 py-10">Nenhum contrato encontrado para os filtros informados.</div>';
       if (statsBar) statsBar.classList.add("hidden");
       return;
     }
@@ -1064,13 +1012,15 @@ function exportContratosCSV() {
 
 async function loadPaymentCards(page = 1) {
   currentCardPage = page;
-  const start = document.getElementById("card-month-start").value; // YYYY-MM
-  const end = document.getElementById("card-month-end").value; // YYYY-MM
+  const start = document.getElementById("card-month-start")?.value || "2024-07"; // YYYY-MM
+  const end = document.getElementById("card-month-end")?.value || "2024-10"; // YYYY-MM
+  const orgao = document.getElementById("card-orgao")?.value || "";
   const container = document.getElementById("cards-results-list");
   const pagination = document.getElementById("cards-pagination");
+  const statsBar = document.getElementById("cards-stats-bar");
 
   if (!start || !end) {
-    alert("Selecione o período.");
+    if (container) container.innerHTML = '<div class="text-center text-amber-400 py-10">⚠️ Selecione o mês de início e término para consultar.</div>';
     return;
   }
 
@@ -1080,63 +1030,74 @@ async function loadPaymentCards(page = 1) {
   const fmtStart = `${m1}/${y1}`;
   const fmtEnd = `${m2}/${y2}`;
 
-  container.innerHTML =
-    '<div class="text-center text-zinc-500 py-10 animate-pulse">Consultando gastos com cartões...</div>';
-  pagination.classList.add("hidden");
+  if (container) container.innerHTML = '<div class="text-center text-zinc-500 py-10 animate-pulse">Consultando gastos com cartões corporativos (CPGF)...</div>';
+  if (pagination) pagination.classList.add("hidden");
+  if (statsBar) statsBar.classList.add("hidden");
 
   try {
-    const endpoint = `cartoes?mesExtratoInicio=${fmtStart}&mesExtratoFim=${fmtEnd}&pagina=${page}`;
+    let endpoint = `cartoes?mesExtratoInicio=${fmtStart}&mesExtratoFim=${fmtEnd}&pagina=${page}`;
+    if (orgao) endpoint += `&codigoOrgao=${orgao}`;
     const data = await api.portal(endpoint);
 
     if (!data || data.erro || data.message) {
-      container.innerHTML = `<div class="text-center text-red-400 py-10 px-4">⚠️ Erro ao consultar cartões:<br><span class="text-zinc-400 text-xs mt-1 block">${data?.erro || data?.message || "Resposta inválida"}</span></div>`;
+      const msg = data?.erro || data?.message || "Resposta inválida";
+      container.innerHTML = `<div class="text-center text-red-400 py-10 px-4 bg-red-950/20 border border-red-500/20 rounded-xl">⚠️ Falha ao consultar cartões corporativos:<br><span class="text-zinc-400 text-xs mt-1 block">${msg}</span></div>`;
       return;
     }
 
     if (!Array.isArray(data) || data.length === 0) {
-      container.innerHTML =
-        '<div class="text-center text-zinc-500 py-10">Nenhum registro encontrado para o período selecionado.</div>';
+      container.innerHTML = '<div class="text-center text-zinc-500 py-10">Nenhum registro de cartão encontrado para o período e órgão selecionados.</div>';
       return;
+    }
+
+    const totalPeriodo = data.reduce((acc, c) => acc + window.parsePtBrFloat(c.valorTransacao || c.valor || "0"), 0);
+
+    if (statsBar) {
+      statsBar.innerHTML = `
+        <div class="flex flex-wrap items-center gap-4 text-xs">
+          <span class="text-zinc-400">💳 <strong class="text-white">${data.length}</strong> transações nesta página</span>
+          <span class="text-zinc-400">💰 Total na Página: <strong class="text-red-400 font-mono">${window.formatCurrency(totalPeriodo)}</strong></span>
+        </div>
+        <div class="text-[10px] text-zinc-500 font-mono">Extrato: ${fmtStart} até ${fmtEnd}</div>
+      `;
+      statsBar.classList.remove("hidden");
     }
 
     container.innerHTML = data
       .map((c) => {
-        // Portal retorna valores como strings PT-BR — usar parsePtBrFloat
         const valor = window.parsePtBrFloat(c.valorTransacao || c.valor || "0");
-        const portador =
-          c.portador?.nome || c.nomePortador || "Sigiloso/Não Identificado";
-        const orgao =
-          c.unidadeGestora?.orgaoVinculado?.nome ||
-          c.unidadeGestora?.nome ||
-          c.nomeOrgao ||
-          "Órgão não informado";
-        const favorecido =
-          c.estabelecimento?.nome || c.nomeFornecedor || "Diversos";
+        const portador = c.portador?.nome || c.nomePortador || "Sigiloso / Não Identificado";
+        const orgaoNome = c.unidadeGestora?.orgaoVinculado?.nome || c.unidadeGestora?.nome || c.nomeOrgao || "Órgão não informado";
+        const favorecido = c.estabelecimento?.nome || c.nomeFornecedor || "Diversos";
         const dataTransacao = c.dataTransacao || c.mesExtrato || "";
+        const tipoCartao = c.tipoCartao?.descricao || "CPGF";
 
         return `
-                <div class="bg-zinc-800 p-4 rounded-xl border border-zinc-700 hover:border-violet-500 transition flex flex-col md:flex-row justify-between gap-4">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] font-bold bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded uppercase">${c.tipoCartao?.descricao || "CPGF"}</span>
-                            <span class="text-xs text-zinc-500">${dataTransacao}</span>
-                        </div>
-                        <h4 class="text-white font-bold text-sm truncate" title="${portador}">${portador}</h4>
-                        <p class="text-zinc-400 text-xs truncate">${orgao}</p>
-                        <div class="mt-2 text-xs text-zinc-300">
-                            <span class="text-zinc-500">Favorecido:</span> ${favorecido}
-                        </div>
-                    </div>
-                    <div class="text-right flex flex-col justify-center">
-                        <div class="text-red-400 font-bold text-sm">${window.formatCurrency(valor)}</div>
-                    </div>
-                </div>
-            `;
+          <div class="bg-zinc-900/60 p-4 md:p-5 rounded-2xl border border-white/5 hover:border-violet-500/50 transition flex flex-col md:flex-row justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span class="text-[10px] font-black bg-zinc-800 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded-md uppercase">${tipoCartao}</span>
+                <span class="text-xs text-zinc-500 font-mono">${dataTransacao}</span>
+              </div>
+              <h4 class="text-white font-bold text-sm md:text-base leading-snug truncate" title="${portador}">${portador}</h4>
+              <p class="text-zinc-400 text-xs truncate mt-0.5">${orgaoNome}</p>
+              <div class="mt-2 text-xs text-zinc-300 flex items-center gap-2">
+                <span class="text-zinc-500 font-medium">Favorecido / Estabelecimento:</span>
+                <span class="font-bold text-zinc-200 truncate">${favorecido}</span>
+              </div>
+            </div>
+            <div class="text-right flex flex-col justify-center flex-shrink-0 self-end md:self-center">
+              <div class="text-red-400 font-black text-base md:text-lg font-mono">${window.formatCurrency(valor)}</div>
+              <div class="text-[9px] text-zinc-500 uppercase font-black">Débito Corporativo</div>
+            </div>
+          </div>
+        `;
       })
       .join("");
 
-    document.getElementById("card-page-num").textContent = `Página ${page}`;
-    pagination.classList.remove("hidden");
+    if (pagination) pagination.classList.remove("hidden");
+    const pageNum = document.getElementById("card-page-num");
+    if (pageNum) pageNum.textContent = `Página ${page}`;
   } catch (e) {
     console.error(e);
     container.innerHTML =
@@ -1149,6 +1110,13 @@ function changeCardPage(delta) {
   if (newPage < 1) return;
   loadPaymentCards(newPage);
 }
+
+// Exposição global explícita para Gestão e Finanças
+window.loadFederalExpenses = loadFederalExpenses;
+window.toggleGestaoMode = toggleGestaoMode;
+window.searchContratos = searchContratos;
+window.loadPaymentCards = loadPaymentCards;
+window.changeCardPage = changeCardPage;
 
 function loadYearsOptions() {
   const currentYear = new Date().getFullYear();
@@ -2355,8 +2323,9 @@ window.searchViagens = async function () {
   const iniDate = dataIni || `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-01`;
   const fimDate = dataFim || `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
 
-  container.innerHTML =
-    '<div class="text-center text-zinc-500 py-10 animate-pulse">Buscando viagens...</div>';
+  container.innerHTML = (typeof window.createSkeleton === 'function') 
+    ? window.createSkeleton('table', 5) 
+    : '<div class="text-center text-zinc-500 py-10 animate-pulse">Buscando viagens...</div>';
   stats.classList.add("hidden");
 
   try {
@@ -2368,6 +2337,14 @@ window.searchViagens = async function () {
       `&dataRetornoDe=${id}/${im}/${iy}&dataRetornoAte=${fd}/${fm}/${fy}`;
 
     const data = await api.portal(endpoint);
+
+    if (data && (data.erro || data.detail || data.message)) {
+      container.innerHTML = `<div class="text-center text-amber-400 py-10 bg-amber-950/20 rounded-xl border border-amber-800/40 p-4">
+        ⚠️ <strong>Aviso da API:</strong> ${data.detail || data.erro || data.message}
+        <br><span class="text-xs text-zinc-400 mt-1 block">Tente ajustar o período ou selecionar outro órgão federal.</span>
+      </div>`;
+      return;
+    }
 
     if (!Array.isArray(data) || data.length === 0) {
       container.innerHTML =
@@ -2473,8 +2450,9 @@ window.searchLicitacoes = async function () {
   const iniDate = dataIni || `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-01`;
   const fimDate = dataFim || `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
 
-  container.innerHTML =
-    '<div class="text-center text-zinc-500 py-10 animate-pulse">Buscando contratos...</div>';
+  container.innerHTML = (typeof window.createSkeleton === 'function') 
+    ? window.createSkeleton('table', 5) 
+    : '<div class="text-center text-zinc-500 py-10 animate-pulse">Buscando contratos...</div>';
   stats.classList.add("hidden");
 
   try {
@@ -2485,8 +2463,11 @@ window.searchLicitacoes = async function () {
 
     const data = await api.portal(endpoint);
 
-    if (data.erro || data.message) {
-      container.innerHTML = `<div class="text-center text-red-400 py-10">${data.erro || data.message}</div>`;
+    if (data && (data.erro || data.detail || data.message)) {
+      container.innerHTML = `<div class="text-center text-amber-400 py-10 bg-amber-950/20 rounded-xl border border-amber-800/40 p-4">
+        ⚠️ <strong>Aviso da API:</strong> ${data.detail || data.erro || data.message}
+        <br><span class="text-xs text-zinc-400 mt-1 block">Tente ajustar a vigência ou selecionar outro ministério.</span>
+      </div>`;
       return;
     }
 
@@ -2775,7 +2756,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadDeputies();
     loadParties();
     loadYearsOptions();
-    setFilterMode("mes");
   } else {
     // Retry simples caso api.js demore um pouco mais
     setTimeout(() => {

@@ -33,7 +33,7 @@ $is_logged_in = isset($_SESSION['user_id']);
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Hyper Z">
-  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="<?php echo BASE_PATH; ?>/img/apple-touch-icon.png">
   <style>
     body { background: #09090b; color: #e4e4e7; min-height: 100vh; }
     body::before {
@@ -194,7 +194,7 @@ $is_logged_in = isset($_SESSION['user_id']);
 
     async function loadRanking() {
       try {
-        const r = await fetch('/api.php?action=game_leaderboard');
+        const r = await fetch((window.BASE_PATH || '') + '/api.php?action=game_leaderboard');
         const data = await r.json();
         if (!Array.isArray(data) || data.length === 0) {
           document.getElementById('leaderboard-list').innerHTML =

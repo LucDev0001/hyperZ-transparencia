@@ -718,7 +718,7 @@
       ["🗺️", "Mapa do portal",           "window.HyperBotGuia?.mostrarMapaPortal?.()"],
       ["🚀", "Tour do iniciante",          "window.HyperBotGuia?.iniciarTour?.('iniciante')"],
       ["🕵️", "Como investigar a fundo",   "window.HyperBotGuia?.iniciarTour?.('investigar_fundo')"],
-      ["🏘️", "Fiscalizar meu município",  "window.HyperBotGuia?.iniciarTour?.('fiscalizar_municipio')"],
+      ["🗺️", "Mapa de gastos públicos",   "window.customSwitchTab?.('mapa')"],
     ];
     const guiaHTML = GUIA_LINKS.map(([ico, lbl, act]) =>
       `<button onclick="${act}"

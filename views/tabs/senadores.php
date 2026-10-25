@@ -107,6 +107,10 @@
         // 1. CARREGAR DADOS
         window.loadSenatorsV7 = async function() {
             try {
+                const grid = document.getElementById('GRID_SENADO_FINAL');
+                if (grid && typeof window.createSkeleton === 'function' && (!window._cacheSenadores || window._cacheSenadores.length === 0)) {
+                    grid.innerHTML = window.createSkeleton('cards', 8);
+                }
                 if (!window.api || !window.api.senado) { setTimeout(loadSenatorsV7, 1000); return; }
                 const res = await window.api.senado('senador/lista/atual.json');
                 const list = res?.ListaParlamentarEmExercicio?.Parlamentares?.Parlamentar || res?.dados || [];
@@ -138,7 +142,12 @@
                 const i = s.IdentificacaoParlamentar;
                 const foto = i.UrlFotoParlamentar.replace('http://', 'https://');
                 return `
-                <div class="sen-card-v6" onclick="window._openSenadorDossie('${i.CodigoParlamentar}')">
+                <div class="sen-card-v6 relative group" onclick="window._openSenadorDossie('${i.CodigoParlamentar}')">
+                    <button onclick="event.stopPropagation(); window.inspectSenator('${i.CodigoParlamentar}')"
+                            title="Prévia Lateral Rápida"
+                            class="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 hover:bg-blue-600 border border-white/10 text-zinc-400 hover:text-white transition-all shadow-md">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </button>
                     <img src="${foto}" class="sen-v6-photo" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(i.NomeParlamentar)}&background=18181b&color=fff'">
                     <div class="sen-v6-name">${i.NomeParlamentar}</div>
                     <div class="sen-v6-party">${i.SiglaPartidoParlamentar} / ${i.UfParlamentar}</div>
